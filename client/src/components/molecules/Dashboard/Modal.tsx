@@ -525,23 +525,25 @@ const Modal = () => {
                           </h5>
                           <h5 className="mt-2 text-sm text-black font-bold dark:text-gray-300 flex gap-2   items-center">
                             Connected Wallet:{" "}
-                            <span className="text-base text-gray-600 dark:text-gray-300">
-                              {shortenHexString(String(address))}
-                            </span>
-                            <span
-                              onClick={async () => {
-                                sessionStorage.removeItem("temp");
-                                sessionStorage.removeItem("MV938aO");
-                                localStorage.removeItem("ref");
-                                const d = await disconnect();
-                                hideModal();
-                                setStage("init");
-                              }}
-                              title="Disconnect Wallet"
-                              className="text-red-600 hover:text-red-800 transition-all cursor-pointer"
-                            >
-                              <PowerButtonI className="w-5 h-5" />
-                            </span>
+                            <div className="flex gap-1 lg:gap-2 items-center justify-between">
+                              <span className="text-base text-gray-600 dark:text-gray-300">
+                                {shortenHexString(String(address))}
+                              </span>
+                              <span
+                                onClick={async () => {
+                                  sessionStorage.removeItem("temp");
+                                  sessionStorage.removeItem("MV938aO");
+                                  localStorage.removeItem("ref");
+                                  const d = await disconnect();
+                                  hideModal();
+                                  setStage("init");
+                                }}
+                                title="Disconnect Wallet"
+                                className="text-red-600 hover:text-red-800 transition-all cursor-pointer"
+                              >
+                                <PowerButtonI className="w-5 h-5" />
+                              </span>
+                            </div>
                           </h5>
                           <h5 className="mt-2 text-sm text-black font-bold dark:text-gray-400">
                             BUSD balance:{" "}
@@ -696,7 +698,7 @@ const Modal = () => {
                           </h5>
                           <h5 className="flex flex-col lg:flex-row gap-1 lg:gap-2 items-center justify-between mt-2 text-sm text-black font-bold dark:text-gray-300">
                             Connected Wallet:{" "}
-                            <div>
+                            <div className="flex gap-1 lg:gap-2 items-center justify-between">
                               <span className="text-base text-gray-600 dark:text-gray-300">
                                 {shortenHexString(String(address))}
                               </span>
