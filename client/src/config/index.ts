@@ -11,10 +11,11 @@ const x = import.meta.env.VITE_LIVE_API;
 const TEST_API = import.meta.env.VITE_TEST_API;
 // const LIVE_API = x !== "" || x.length > 0 ? x : ""; //
 
-// const LIVE_API = "https://application.nestage.io/api/v1/";
+// const LIVE_API = "https://application.nestage.io/api/v1/"; // Mainnet - 1
 // const LIVE_API = "https://nestage-server-main.onrender.com/api/v1/"; // Mainnet - 2
-const LIVE_API = "https://nestage-server-main.onrender.com/api/v1/"; // testnet
+const LIVE_API = "https://nestage-server-testing.onrender.com/api/v1/"; // Testnet
 // const LIVE_API = "https://n-server-1lbk.onrender.com/api/v1/";
+
 
 export const API_URL = SITE_MODE === "live" ? LIVE_API : TEST_API;
 
