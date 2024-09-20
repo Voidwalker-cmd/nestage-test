@@ -464,6 +464,19 @@ export const setTransactionState = createAsyncThunk<
   }
 });
 
+export const setCheeckState = createAsyncThunk<
+  string,
+  { state: string },
+  { rejectValue: { message: string } }
+>("client/set-tranaction-state", async ({ state }, thunkAPI) => {
+  const stateTypes = ["loading"];
+  if (stateTypes.includes(state)) {
+    return state;
+  } else {
+    return thunkAPI.rejectWithValue({ message: "failed" });
+  }
+});
+
 export const saveReferral = createAsyncThunk<
   Types.SaveReferralresponse,
   { refValue: string },
@@ -618,6 +631,10 @@ export interface ClientState {
   loading: boolean;
   transactionState: string;
   regLoading: boolean;
+  checkState: boolean;
+  checkFailed: boolean;
+  checkState2: boolean;
+  checkFailed2: boolean;
   isAuthenticated: boolean;
   error: boolean;
   userId: number | null;
@@ -631,6 +648,10 @@ const initialState: ClientState = {
   loading: !!0,
   regLoading: !!0,
   transactionState: "init",
+  checkState: !!0,
+  checkFailed: !!0,
+  checkState2: !!0,
+  checkFailed2: !!0,
   isAuthenticated: !!0,
   error: !!0,
   adminWallet: { admin: "", refAdmin: "" },
@@ -694,6 +715,17 @@ const clientSlice = createSlice({
         state.loading = !!0;
         // state.error = !!1;
         // state.isAuthenticated = !!0;
+      })
+      .addCase(setCheeckState.pending, (state) => {
+        state.checkState = !!1;
+      })
+      .addCase(setCheeckState.fulfilled, (state) => {
+        state.checkState = !!0;
+        state.checkFailed = !!0;
+      })
+      .addCase(setCheeckState.rejected, (state) => {
+        state.checkState = !!0;
+        state.checkFailed = !!1;
       })
       .addCase(setTransactionState.pending, (state) => {
         state.loading = !!1;
@@ -776,14 +808,19 @@ const clientSlice = createSlice({
       })
       .addCase(getRef.pending, (state) => {
         state.loading = !!1;
+        state.checkState2 = !!1;
       })
       .addCase(getRef.fulfilled, (state, action) => {
         state.loading = !!0;
         state.userRef = action.payload;
+        state.checkState2 = !!0;
+        state.checkFailed2 = !!0;
         // state.isAuthenticated = !!1;
       })
       .addCase(getRef.rejected, (state) => {
         state.loading = !!0;
+        state.checkState2 = !!0;
+        state.checkFailed2 = !!1;
         // state.error = !!1;
         // state.isAuthenticated = !!0;
       })
