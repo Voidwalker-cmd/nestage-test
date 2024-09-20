@@ -125,12 +125,7 @@ const NotificationCreateCard = () => {
   }, []);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  useEffect(() => {
     const ti = title.split(" ");
-    console.log(ti);
     const te = text.split(" ");
     ti.length >= 2 &&
     ti.length <= 6 &&
