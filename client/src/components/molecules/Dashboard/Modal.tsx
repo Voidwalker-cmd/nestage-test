@@ -35,6 +35,7 @@ import {
 import { getReferral } from "../../../helper/functions/SaveReferralLink";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import Busd from "../Busd";
+import { SiteUrl } from "../../../const";
 
 const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
 
@@ -130,8 +131,11 @@ const Modal = () => {
 
     // TODO: Remove 6am
     if (SITE_MODE === "live") {
-      if (Number(amt) < 10) {
-        setErr("Amount should be above $10.");
+      const lmt = SiteUrl.includes("testing") ? 2 : 10;
+      if (Number(amt) < lmt) {
+        setErr(
+          `Amount should be above ${SiteUrl.includes("testing") ? "2" : "10"}.`
+        );
         return 0;
       }
     }
@@ -174,7 +178,7 @@ const Modal = () => {
     // }
 
     const a = djs().valueOf();
-    const b = djs().add(25, "day").valueOf();
+    const b = djs().add(1, "day").valueOf();
     const y = sym.toLocaleLowerCase();
     // console.log(p, y, x);
     // // console.log(x[y]);
@@ -233,7 +237,7 @@ const Modal = () => {
 
   const handlePayReferral = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const amt = 10;
+    const amt = SiteUrl.includes("testing") ? 2 : 10;
 
     const busd: string = await getBUSD();
 
@@ -397,7 +401,7 @@ const Modal = () => {
                         <CardBody>
                           <span className="text-small text-default-500">
                             <ul className="checklist">
-                              <li>Minimum entry fee 10 BUSD</li>
+                              <li>Minimum entry fee 2 BUSD</li>
                               <li>40% profit on your stake</li>
                               <li>Instant transactions</li>
                               <li>Zero effort required</li>
@@ -433,7 +437,7 @@ const Modal = () => {
                         <CardBody>
                           <span className="text-small text-default-500">
                             <ul className="checklist">
-                              <li>Entry fee 10 BUSD</li>
+                              <li>Entry fee 2 BUSD</li>
                               <li>Referral-based earnings</li>
                               <li>Transparency and automation</li>
                               <li>3 level matrix</li>
@@ -590,7 +594,7 @@ const Modal = () => {
                           >
                             Amount{" "}
                             <small className="italic font-semibold font-primary text-sm">
-                              (Min. $10)
+                              (Min. ${SiteUrl.includes("testing") ? "2" : "10"})
                             </small>
                           </label>
 
@@ -672,7 +676,8 @@ const Modal = () => {
                       <>
                         <div className="flex flex-col justify-center w-full items-center my-1 space-y-3">
                           <p className="block text-center text-black dark:text-white">
-                            To activate Level Two you are to pay $10
+                            To activate Level Two you are to pay $$
+                            {SiteUrl.includes("testing") ? "2" : "10"}
                           </p>
                           {err && (
                             <span className="block text-center text-xs font-primary italic tracking-wider text-rose-600">
@@ -796,11 +801,11 @@ const Modal = () => {
                                 onClick={handlePayReferral}
                                 className="w-full px-4 py-2 mt-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
                               >
-                                PAY $10
+                                PAY ${SiteUrl.includes("testing") ? "2" : "10"}
                               </button>
                             ) : (
                               <span className="cursor-not-allowed bg-opacity-50 w-full px-4 py-2 mt-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-400 rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-blue-200 focus:outline-none focus:ring focus:ring-blue-200 focus:ring-opacity-40">
-                                PAY $10
+                                PAY ${SiteUrl.includes("testing") ? "2" : "10"}
                               </span>
                             )}
                           </div>
