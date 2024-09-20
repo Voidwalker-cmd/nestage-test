@@ -194,7 +194,7 @@ const Modal = () => {
         console.error("Error:", result.error);
       } else {
         createNewUser();
-        if (result.data?.receipt?.confirmations > 0) {
+        if (result.data?.confirmations > 0) {
           setTxt("Finishing your request");
           const referralCode = generateRandomString(8);
 
@@ -282,7 +282,7 @@ const Modal = () => {
         }
       } else {
         createNewUser();
-        if (result.data?.receipt?.confirmations > 0) {
+        if (result.data?.confirmations > 0) {
           setTxt("Finishing your request");
           const referralCode = generateRandomString(8);
 

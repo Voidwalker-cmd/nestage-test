@@ -143,16 +143,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         };
       }
 
-      const sending = [
-        adminWallet,
-        startDate,
-        endDate,
-        prt,
-        payUpline.hasUpline,
-        payUpline.uplineAddress,
-        payUpline.pay,
-      ];
-      const info = [nestageAddress, amt];
 
       // const data = await contract?.call("startNewStake", sending, {
       //   value: amt,
@@ -205,8 +195,16 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
+          if(tx.status === 1 ||tx.status === '1' ) { 
           dispatch(saveStat({ type: "levelOne", amount }));
           dispatch(setTransactionState({ state: "payed" }));
+          
+           result = {
+        isLoading: false,
+        data: tx,
+        error: null,
+      };
+          }
         } catch (error) {
           console.error("Error calling startNewStake:", error);
         }
@@ -214,13 +212,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         console.error("Dapp is not installed!");
       }
 
-      // log(data);
-
-      result = {
-        isLoading: false,
-        data: data,
-        error: null,
-      };
     } catch (error) {
       const errorMessage = (error as Error).message;
       result = {
@@ -354,9 +345,8 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             dispatch(setTransactionState({ state: "paying" }));
 
             await tx.wait();
-            dispatch(setTransactionState({ state: "payed" }));
 
-            if (tx.hash) {
+            if (tx.status === 1 || tx.status === '1') {
               const l: string[] = info[0];
               const len = l.length;
               let amt,
@@ -384,8 +374,22 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
                   })
                 );
               }
-            }
-            dispatch(saveStat({ type: "levelTwo", amount }));
+              dispatch(saveStat({ type: "levelTwo", amount }));
+              dispatch(setTransactionState({ state: "payed" }));
+              result = {
+          isLoading: false,
+          data: tx,
+          error: null,
+        };
+            } else {
+            const idx = sessionStorage.getItem("temp");
+            const rm = async () => {
+              const resx = await dispatch(removeRef({ id: String(idx) }));
+              resx.meta.requestStatus !== "rejected" &&
+                sessionStorage.removeItem("temp");
+            };
+            if (idx) rm();
+          }
           } catch (error) {
             const idx = sessionStorage.getItem("temp");
             const rm = async () => {
@@ -399,13 +403,13 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           console.error("Dapp is not installed!");
         }
 
-        result = {
-          isLoading: false,
-          data: data || "",
-          error: null,
-        };
       } else {
         console.log("Request rejected!!");
+        result = {
+          isLoading: false,
+          data: "rejected",
+          error: "rejected",
+        };
       }
     } catch (error) {
       const errorMessage = (error as Error).message;
