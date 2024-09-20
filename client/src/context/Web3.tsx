@@ -20,6 +20,7 @@ import {
   getWallets,
   removeRef,
   saveStat,
+  setCheeckState,
   setTransactionState,
 } from "../features/client";
 import { getReferral } from "../helper/functions/SaveReferralLink";
@@ -423,20 +424,26 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
   // Function to get minings
   const getMinings = async (): Promise<Types.ParsedMiningData[]> => {
+    dispatch(setCheeckState({ state: "loading" }));
     const minings: Types.MiningData[] = await contract?.call("getAllStakes");
 
-    // Parse the raw mining data
-    const parsedMining = minings?.map(
-      (mining): Types.ParsedMiningData => ({
-        staker: mining.staker,
-        amount: eth.utils.formatUnits(mining.amount, "ether"),
-        startDate: mining.startDate.toNumber(),
-        endDate: mining.endDate.toNumber(),
-        profit: eth.utils.formatUnits(mining.profit, "ether"),
-      })
-    );
+    try {
+      // Parse the raw mining data
+      const parsedMining = minings?.map(
+        (mining): Types.ParsedMiningData => ({
+          staker: mining.staker,
+          amount: eth.utils.formatUnits(mining.amount, "ether"),
+          startDate: mining.startDate.toNumber(),
+          endDate: mining.endDate.toNumber(),
+          profit: eth.utils.formatUnits(mining.profit, "ether"),
+        })
+      );
 
-    return parsedMining || [];
+      return parsedMining || [];
+    } catch (error: any) {
+      dispatch(setCheeckState({ state: "not-found" }));
+      return [];
+    }
   };
 
   async function getBUSDBalance(walletAddress: string) {

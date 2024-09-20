@@ -676,7 +676,7 @@ const Modal = () => {
                       <>
                         <div className="flex flex-col justify-center w-full items-center my-1 space-y-3">
                           <p className="block text-center text-black dark:text-white">
-                            To activate Level Two you are to pay $$
+                            To activate Level Two you are to pay $
                             {SiteUrl.includes("testing") ? "2" : "10"}
                           </p>
                           {err && (
