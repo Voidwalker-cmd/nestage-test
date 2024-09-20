@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract Nestage {
+    address public admin;
+    IERC20 public usdtToken;
+    uint256 public numberOfMinings = 0;
+    address public referralAdmin;
+    uint256 public constant registrationFee = 10 * 10**6; // Assuming USDT has 6 decimals
+
+    struct Mining {
+        address miner;
+        uint256 amount;
+        uint256 startDate;
+        uint256 endDate;
+        uint256 profit;
+        bool isProfitSent;
+    }
+
+    // Array to store all mining uuids
+    bytes32[] private miningUuids;
+
+    // Mapping from miner's uuid to their mining
+    mapping(bytes32 => Mining) public minings;
+
+    // Define the USDT token contract address on Polygon network
+    // constructor(address _usdtTokenAddress) {
+    //     admin = msg.sender;
+    //     usdtToken = IERC20(_usdtTokenAddress);
+    // }
+    constructor() {
+        // Polygon USDT contract address
+        usdtToken = IERC20(0xc2132d05d31c914a87c6611c10748aeb04b58e8f);
+        admin = msg.sender;
+        referralAdmin = msg.sender;
+    }
+
+    // Function to allow users to mine USDT with details
+    function startMinig(
+        bytes32 _uuid,
+        uint256 _amount,
+        uint256 _startDate,
+        uint256 _endDate,
+        uint256 _profit
+    ) external {
+        require(_amount > 0, "Amount must be greater than 0");
+        minings[_uuid] = Mining(
+            msg.sender,
+            _amount,
+            _startDate,
+            _endDate,
+            _profit,
+            false
+        );
+        miningUuids.push(_uuid);
+        usdtToken.transferFrom(msg.sender, admin, _amount);
+
+        numberOfMinings++;
+    }
+
+    // Function to allow admin to send profit back to users
+    function sendProfit(bytes32 _uuid) external {
+        require(msg.sender == admin, "Only admin can send profits");
+        Mining storage mining = minings[_uuid];
+        require(!mining.isProfitSent, "Profit already sent");
+        usdtToken.transfer(mining.miner, mining.profit);
+        mining.isProfitSent = true;
+    }
+
+    // Function to get all mining details
+    function getAllMinings() public view returns (Mining[] memory) {
+        Mining[] memory allMinings = new Mining[](numberOfMinings);
+        for (uint256 i = 0; i < miningUuids.length; i++) {
+            allMinings[i] = minings[miningUuids[i]];
+        }
+        return allMinings;
+    }
+
+    // Function to get all UUIDs of the minings
+    function getAllUuids() external view returns (bytes32[] memory) {
+        return miningUuids;
+    }
+
+    // Function to update the admin address
+    function updateAdmin(address _newAdmin) external {
+        require(
+            msg.sender == admin,
+            "Only the current admin can update the admin address"
+        );
+        admin = _newAdmin;
+    }
+
+    // Function to update the referral admin address
+    function updateReferralAdmin(address _newAdmin) external {
+        require(
+            msg.sender == referralAdmin,
+            "Only the current admin can update the admin address"
+        );
+        referralAdmin = _newAdmin;
+    }
+
+    // Referral Program
+
+    struct User {
+        address referrer;
+        uint256 reward;
+        address[] referrals;
+    }
+
+    mapping(address => User) public users;
+
+    event Registered(address indexed user, address indexed referrer);
+    event RewardPaid(address indexed referrer, uint256 reward);
+
+    function register(address _referrer) external {
+        require(usdtToken.transferFrom(msg.sender, address(this), registrationFee), "Transfer failed");
+
+        User storage user = users[msg.sender];
+        require(user.referrer == address(0), "User already registered");
+
+        user.referrer = _referrer;
+        users[_referrer].referrals.push(msg.sender);
+
+        payReferralRewards(msg.sender);
+
+        emit Registered(msg.sender, _referrer);
+    }
+
+    function payReferralRewards(address _user) private {
+        address currentReferrer = users[_user].referrer;
+        uint256 level = 1;
+        uint256 reward;
+        uint256 didTransfer = 0;
+        // uint256 payLoop = 0;
+
+        while (currentReferrer != address(0) && level <= 3) {
+            if (level == 1) {
+                reward = 4 * 10**6; // 4 USDT
+            } else if (level == 2) {
+                reward = 2 * 10**6; // 2 USDT
+            } else if (level == 3) {
+                reward = 1.5 * 10**6; // 1.5 USDT
+            }
+
+            users[currentReferrer].reward += reward;
+            usdtToken.transfer(currentReferrer, reward);
+            emit RewardPaid(currentReferrer, reward);
+
+            currentReferrer = users[currentReferrer].referrer;
+            level++;
+            // payLoop++;
+        }
+
+
+        if((level - 1) == 3) {
+            didTransfer = 4 + 2 + 1.5;
+        }  else if((level - 1) == 2) {
+            didTransfer = 4 + 2;
+        } else if((level - 1) == 1) {
+            didTransfer = 4;
+        } 
+
+        uint256 adminReward = registrationFee - (didTransfer) * 10**6;
+        usdtToken.transfer(admin, adminReward);
+    }
+
+    function getReferralChain(address _user) public view returns (address[] memory) {
+        return users[_user].referrals;
+    }
+
+    function getRewards(address _user) public view returns (uint256) {
+        return users[_user].reward;
+    }
+
+    function getAllUsersWithReferrals() public view returns (address[] memory, address[][] memory) {
+        address[] memory userAddresses = new address[](allUsers.length);
+        address[][] memory referralChains = new address[][](allUsers.length);
+
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            address user = allUsers[i];
+            userAddresses[i] = user;
+            referralChains[i] = users[user].referrals;
+        }
+
+        return (userAddresses, referralChains);
+    }
+}

@@ -1,0 +1,250 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+}
+
+contract Nestage {
+    using SafeMath for uint256;
+
+    IERC20 public token;
+    address public admin;
+    address public referralAdmin;
+    uint256 public numberOfStakes = 0;
+    uint256 public constant registrationFee = 10 * 10 ** 6;
+
+    struct Stake {
+        uint256 id;
+        uint256 amount;
+        uint256 startDate;
+        uint256 endDate;
+        uint256 profit;
+        address staker;
+    }
+
+    address[] public allStakers;
+    uint256 public nextStakeId;
+    mapping(uint256 => Stake) public stakes;
+    mapping(address => uint256[]) private stakerToStakes;
+
+    constructor(address _token) {
+        token = IERC20(_token);
+        admin = msg.sender;
+        referralAdmin = msg.sender;
+    }
+
+    function checkAllowance(address _owner) public view returns (uint256) {
+        return token.allowance(_owner, address(this));
+    }
+
+    function checkTokenBal() public view returns (uint256) {
+        return token.balanceOf(msg.sender);
+    }
+
+    function startStake(
+        uint256 _amount,
+        uint256 _startDate,
+        uint256 _endDate,
+        uint256 _profit
+    ) external {
+        require(_amount > 0, "Amount must be greater than 0");
+        require(
+            _startDate >= block.timestamp,
+            "Start date must be in the future"
+        );
+        require(_endDate > _startDate, "End date must be after start date");
+        require(_profit >= 0, "Profit must be non-negative");
+
+        // Assuming the contract has a method to ensure the staker has approved the contract to spend their tokens
+        require(
+            token.allowance(msg.sender, address(this)) >= _amount,
+            "Token allowance too low"
+        );
+        require(
+            token.balanceOf(msg.sender) >= _amount,
+            "Insufficient token balance"
+        );
+
+        // Transfer the tokens from the staker to the contract
+        bool sent = token.transferFrom(msg.sender, address(this), _amount);
+        require(sent, "Token transfer failed");
+
+        uint256 stakeId = nextStakeId++;
+        stakes[stakeId] = Stake({
+            id: stakeId,
+            amount: _amount,
+            startDate: _startDate,
+            endDate: _endDate,
+            profit: _profit,
+            staker: msg.sender
+        });
+
+        stakerToStakes[msg.sender].push(stakeId);
+    }
+
+    function getAllStakes() external view returns (Stake[] memory) {
+        Stake[] memory userStakes = new Stake[](nextStakeId);
+        for (uint256 i = 0; i < stakerToStakes[msg.sender].length; i++) {
+            uint256 stakeId = stakerToStakes[msg.sender][i];
+            userStakes[i] = stakes[stakeId];
+        }
+        return userStakes;
+    }
+
+    function distributeProfit(uint256 _stakeId) external {
+        require(msg.sender == admin, "Only admin can distribute profits");
+        Stake storage stake = stakes[_stakeId];
+        require(
+            block.timestamp >= stake.endDate,
+            "Staking period not yet ended"
+        );
+
+        // Ensure there is enough balance and allowance before attempting the transfer
+        require(
+            token.transfer(stake.staker, stake.profit),
+            "Profit transfer failed"
+        );
+    }
+
+    function changeAdmin(address newAdmin) external {
+        require(
+            msg.sender == admin,
+            "Only the current admin can change the admin"
+        );
+        admin = newAdmin;
+    }
+
+    // Referral Program
+    struct User {
+        address referrer;
+        uint256 reward;
+        address[] referrals;
+    }
+
+    mapping(address => User) public users;
+    address[] public allUsers;
+
+    event Registered(address indexed user, address indexed referrer);
+    event RewardPaid(address indexed referrer, uint256 reward);
+
+    function register(address _referrer) external {
+        require(
+            token.transfer(referralAdmin, registrationFee),
+            "Transfer failed"
+        );
+
+        User storage user = users[msg.sender];
+        require(user.referrer == address(0), "User already registered");
+        require(
+            users[_referrer].referrer != address(0) ||
+                _referrer == referralAdmin,
+            "Invalid referrer"
+        );
+
+        user.referrer = _referrer;
+        users[_referrer].referrals.push(msg.sender);
+        allUsers.push(msg.sender);
+
+        payReferralRewards(msg.sender);
+
+        emit Registered(msg.sender, _referrer);
+    }
+
+    function payReferralRewards(address _user) public payable {
+        address currentReferrer = users[_user].referrer;
+        uint256 level = 1;
+        uint256 reward;
+        uint256 didTransfer = 0;
+
+        while (currentReferrer != address(0) && level <= 3) {
+            if (level == 1) {
+                reward = 4 * 10 ** 6; // 4 USDT
+            } else if (level == 2) {
+                reward = 2 * 10 ** 6; // 2 USDT
+            } else if (level == 3) {
+                reward = 1.5 * 10 ** 6; // 1.5 USDT
+            }
+
+            users[currentReferrer].reward = users[currentReferrer].reward.add(
+                reward
+            );
+            token.transfer(currentReferrer, reward);
+            emit RewardPaid(currentReferrer, reward);
+
+            currentReferrer = users[currentReferrer].referrer;
+            level++;
+        }
+
+        if ((level - 1) == 3) {
+            uint256 scale = (4 * 10) + (2 * 10) + 15;
+            didTransfer = scale / 10;
+        } else if ((level - 1) == 2) {
+            didTransfer = 4 + 2;
+        } else if ((level - 1) == 1) {
+            didTransfer = 4;
+        }
+
+        uint256 adminReward = registrationFee.sub(didTransfer.mul(10 ** 6));
+        token.transfer(referralAdmin, adminReward);
+    }
+
+    function getReferralChain(
+        address _user
+    ) public view returns (address[] memory) {
+        return users[_user].referrals;
+    }
+
+    function getRewards(address _user) public view returns (uint256) {
+        return users[_user].reward;
+    }
+
+    function getAllUsersWithReferrals()
+        public
+        view
+        returns (address[] memory, address[][] memory)
+    {
+        address[] memory userAddresses = new address[](allUsers.length);
+        address[][] memory referralChains = new address[][](allUsers.length);
+
+        for (uint256 i = 0; i < allUsers.length; i++) {
+            address user = allUsers[i];
+            userAddresses[i] = user;
+            referralChains[i] = users[user].referrals;
+        }
+
+        return (userAddresses, referralChains);
+    }
+
+    function updateReferralAdmin(address _newReferralAdmin) external {
+        require(
+            msg.sender == admin,
+            "Only the current admin can update the referral admin address"
+        );
+        referralAdmin = _newReferralAdmin;
+    }
+}

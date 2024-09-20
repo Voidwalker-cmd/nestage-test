@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cbBtn {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+}
+
+.video-background {
+    opacity: 0.3;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.float-coin {
+    position: absolute;
+    opacity: 0.4;
+    animation: bounce 2s infinite;
+}
+
+.float-coin {
+    @apply w-[7%] lg:w-[5%]
+}
+
+.float-coin:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.float-coin:nth-child(2) {
+    top: 20%;
+    right: 15%;
+    animation-delay: 0.5s;
+}
+
+.float-coin:nth-child(3) {
+    top: 40%;
+    left: 25%;
+    animation-delay: 1s;
+}
+
+.float-coin:nth-child(4) {
+    bottom: 30%;
+    right: 20%;
+    animation-delay: 1.5s;
+}
+
+.float-coin:nth-child(5) {
+    bottom: 50%;
+    left: 15%;
+    animation-delay: 2s;
+}
+
+.float-coin:nth-child(6) {
+    bottom: 20%;
+    right: 5%;
+    animation-delay: 2.5s;
+}
+
+.checklist {
+    list-style: none;
+    padding: 0;
+}
+
+.checklist li {
+    position: relative;
+    padding-left: 1.5em;
+}
+
+.checklist li::before {
+    content: "✔️";
+    position: absolute;
+    left: 0;
+    color: green;
+}
+
+.igr {
+    font-family: "Irish Grover", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}

@@ -1,0 +1,6 @@
+[
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function allowance(address owner, address spender) public view returns (uint256)",
+            "function transfer(address recipient, uint256 amount) public returns (bool)",
+            "function balanceOf(address account) public view returns (uint256)"
+          ]

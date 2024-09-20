@@ -1,0 +1,247 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.9;
+
+interface IERC20 {
+    function transfer(address to, uint256 value) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
+
+contract Nestage {
+    IERC20 public usdt;
+
+    constructor(address _usdtAddress) {
+        usdt = IERC20(_usdtAddress);
+    }
+
+    struct Plan {
+        address owner;
+        string name;
+        uint256 rate;
+        bool isActive;
+        uint256 baseAmt;
+        uint256 totalMinier;
+        address[] mining;
+    }
+
+    struct Mining {
+        address owner;
+        uint256 planId;
+        uint256 amount;
+        uint256 startDate;
+        uint256 endDate;
+        uint256 profit;
+    }
+
+    struct ReferralInfo {
+        address owner;
+        string referralLink;
+    }
+
+    struct Referral {
+        address owner;
+        string referralLink;
+        ReferralInfo[] referrals;
+    }
+
+    mapping(uint256 => Plan) public plans;
+    mapping(uint256 => Mining) public minings;
+    mapping(uint256 => Referral) public referrals;
+
+    Referral[] private allReferrals;
+    mapping(string => uint256) private referralLinksToIds;
+
+    uint256 public numberOfPlans = 0;
+    uint256 public numberOfMinings = 0;
+    uint256 public numberOfReferrals = 0;
+
+    uint256 public constant referralFeeAmount = 10;
+
+    address private adminAddress = 0x16350683E09657cDe70430c28ec7880DAD6012e2;
+
+    modifier onlyAdmin() {
+        require(
+            msg.sender == adminAddress,
+            "Only admin can perform this action"
+        );
+        _;
+    }
+
+    function checkWalletBalance() public view returns (uint256) {
+        return address(msg.sender).balance;
+    }
+
+    function createPlan(
+        string memory _name,
+        uint256 _rate,
+        bool _isActive,
+        uint256 _baseAmt
+    ) public onlyAdmin returns (uint256) {
+        Plan storage plan = plans[numberOfPlans];
+        plan.owner = msg.sender;
+        plan.name = _name;
+        plan.rate = _rate;
+        plan.isActive = _isActive;
+        plan.baseAmt = _baseAmt;
+        plan.totalMinier = 0;
+
+        numberOfPlans++;
+
+        return numberOfPlans - 1;
+    }
+
+    function getPlans() public view returns (Plan[] memory) {
+        Plan[] memory allPlans = new Plan[](numberOfPlans);
+
+        for (uint256 i = 0; i < numberOfPlans; i++) {
+            allPlans[i] = plans[i];
+        }
+
+        return allPlans;
+    }
+
+    function deactivatePlan(
+        uint256 _id,
+        bool _isActive
+    ) public onlyAdmin returns (bool) {
+        plans[_id].isActive = _isActive;
+        return true;
+    }
+
+    function startMining(
+        uint256 _planId,
+        uint256 _amount,
+        uint256 _startDate,
+        uint256 _endDate,
+        uint256 _profit
+    ) public payable returns (uint256) {
+        require(_planId < numberOfPlans, "Invalid plan ID");
+        require(msg.value == _amount, "Incorrect value sent");
+
+        Plan storage plan = plans[_planId];
+
+        (bool sent, ) = payable(adminAddress).call{value: _amount}("");
+        require(sent, "Payment failed");
+
+        minings[numberOfMinings] = Mining({
+            owner: msg.sender,
+            planId: _planId,
+            amount: _amount,
+            startDate: _startDate,
+            endDate: _endDate,
+            profit: _profit
+        });
+
+        plan.mining.push(msg.sender);
+        plan.totalMinier++;
+        numberOfMinings++;
+
+        return numberOfMinings - 1;
+    }
+
+    function getMinings() public view returns (Mining[] memory) {
+        Mining[] memory allMinings = new Mining[](numberOfMinings);
+
+        for (uint256 i = 0; i < numberOfMinings; i++) {
+            allMinings[i] = minings[i];
+        }
+
+        return allMinings;
+    }
+
+    function activateReferralWithLink(
+        string memory _ownRefLink,
+        string memory _referralLink,
+        address payable _referral
+    ) public payable returns (uint) {
+        Referral storage referral = referrals[numberOfReferrals];
+        ReferralInfo memory newReferralInfo = ReferralInfo(
+            _referral,
+            _referralLink
+        );
+        require(msg.value >= referralFeeAmount, "Insufficient fee");
+
+        address user = msg.sender;
+
+        uint256 len = bytes(_referralLink).length;
+
+        uint256 counter = 1;
+
+        uint256 rate;
+
+        referral.owner = user;
+        referral.referralLink = _ownRefLink;
+        referral.referrals.push(newReferralInfo);
+
+        if (len > 0) {
+            while (len > 0 && counter <= 3) {
+                if (counter == 1) {
+                    rate = 40;
+                } else if (counter == 2) {
+                    rate = 25;
+                } else if (counter == 3) {
+                    rate = 15;
+                }
+
+                ReferralInfo[] memory ref = getReferralByLink(_referralLink);
+
+                uint256 amt = (referralFeeAmount * rate) / 100;
+                address payable receiver = payable(ref[0].owner);
+                receiver.transfer(amt);
+
+                len = bytes(ref[0].referralLink).length;
+
+                counter++;
+            }
+        }
+
+        numberOfReferrals++;
+
+        return numberOfReferrals - 1;
+    }
+
+    function getReferralByLink(
+        string memory _referralLink
+    ) public view returns (ReferralInfo[] memory x) {
+        uint256 referralId = referralLinksToIds[_referralLink];
+        return (allReferrals[referralId].referrals);
+    }
+
+    function getAllReferrals() public view returns (Referral[] memory) {
+        Referral[] memory allReferralItems = new Referral[](numberOfReferrals);
+
+        for (uint256 i = 0; i < numberOfReferrals; i++) {
+            allReferralItems[i] = referrals[i];
+        }
+
+        return allReferralItems;
+    }
+
+    event MiningPaymentApproved(
+        address indexed owner,
+        uint256 indexed miningId,
+        uint256 amount
+    );
+
+    function approveMiningPayments(
+        uint256[] memory _miningIds
+    ) public onlyAdmin {
+        for (uint256 i = 0; i < _miningIds.length; i++) {
+            uint256 miningId = _miningIds[i];
+            require(miningId < numberOfMinings, "Invalid mining ID");
+
+            Mining storage mining = minings[miningId];
+
+            require(
+                block.timestamp >= mining.endDate,
+                "Mining not yet completed"
+            );
+
+            (bool sent, ) = payable(mining.owner).call{value: mining.profit}(
+                ""
+            );
+            require(sent, "Payment failed");
+
+            emit MiningPaymentApproved(mining.owner, miningId, mining.profit);
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "hardhat-javascript-starter",
+  "scripts": {
+    "build": "npx thirdweb@latest detect",
+    "deploy": "npx thirdweb@latest deploy -k rmRtqWz2oW3L9W0XK7sRN9FP-9oMIPwwNsub3CR8mhp6mc9uxRK7h7kEMW3FWyJgDv8e6A7X_QkgYLReQkcOoA",
+    "logout": "npx thirdweb@latest logout",
+    "login": "npx thirdweb@latest login",
+    "deploy:mainnet": "npx thirdweb@latest deploy --network polygon",
+    "deploy:testnet": "npx thirdweb@latest deploy --network mumbai",
+    "release": "npx thirdweb@latest release"
+  },
+  "devDependencies": {
+    "@matterlabs/hardhat-zksync-solc": "^0.3.17",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.13.0"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "@thirdweb-dev/contracts": "^3.15.0",
+    "dotenv": "^16.4.5",
+    "zksync-web3": "^0.14.3"
+  }
+}
