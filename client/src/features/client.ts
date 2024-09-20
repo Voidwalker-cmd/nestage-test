@@ -468,7 +468,7 @@ export const setCheeckState = createAsyncThunk<
   string,
   { state: string },
   { rejectValue: { message: string } }
->("client/set-tranaction-state", async ({ state }, thunkAPI) => {
+>("client/set-check-state", async ({ state }, thunkAPI) => {
   const stateTypes = ["loading"];
   if (stateTypes.includes(state)) {
     return state;
