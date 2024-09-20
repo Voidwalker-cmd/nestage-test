@@ -9,7 +9,7 @@ export const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 
 // const LIVE_API = "https://application.nestage.io/api/v1/"; // Mainnet - 1
 // const LIVE_API = "https://nestage-server-main.onrender.com/api/v1/"; // Mainnet - 2
-const LIVE_API = "https://nestage-server-testing.onrender.com/api/v1/"; // Testnet
+const LIVE_API = "https://api-testing.nestage.io/api/v1/"; // Testnet
 // const LIVE_API = "https://n-server-1lbk.onrender.com/api/v1/";
 
 export const SITE_URL = SITE_MODE === "live" ? LIVE_NESTAGE : TEST_NESTAGE;
