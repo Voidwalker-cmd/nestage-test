@@ -169,6 +169,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   const initX = async () => {
     let result = !!0;
     const x = await getMinings();
+    console.log(x);
     if (x.length) result = searchStringInArray(x, address);
 
     setHasMining(result);

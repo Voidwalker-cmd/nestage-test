@@ -43,7 +43,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     initX();
-  });
+  }, []);
 
   const init = async (): Promise<void> => {
     if (address !== "Loading Address..." && address !== "") {

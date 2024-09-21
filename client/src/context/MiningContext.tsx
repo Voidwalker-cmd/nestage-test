@@ -45,7 +45,7 @@ export const MiningProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     initX();
-  }, [getMinings]);
+  }, []);
 
   return (
     <MiningContext.Provider value={{ minings }}>

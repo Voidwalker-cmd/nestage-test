@@ -28,7 +28,7 @@ const LevelStatus = () => {
 
   useEffect(() => {
     initX();
-  });
+  }, []);
 
   return (
     <>
