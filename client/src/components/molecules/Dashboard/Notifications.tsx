@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { DropdownNotificationsProps, RootState } from "../../../types/types";
+import {
+  DropdownNotificationsProps,
+  RootState,
+  getNotificationsRaw,
+} from "../../../types/types";
 import { Static } from "../../../assets/img";
 import { CloseIconL } from "../../atom/Icons";
 import { useDispatch } from "../../../hooks";
@@ -18,6 +22,7 @@ const DropdownNotifications = ({
   const { notifications: noti, userId } = useTypedSelector(
     (state) => state.client
   );
+  const [notis, setNotis] = useState<getNotificationsRaw[]>([]);
 
   const [hasNew, setHasNew] = useState<boolean>(false);
 
@@ -57,6 +62,11 @@ const DropdownNotifications = ({
   useEffect(() => {
     userId && initX();
   }, []);
+
+  useEffect(() => {
+    const flipped = noti.slice().reverse();
+    setNotis(flipped);
+  }, [noti]);
 
   return (
     <div className="relative inline-flex">
@@ -102,16 +112,15 @@ const DropdownNotifications = ({
           </div>
           <CloseIconL className="w-6 h-6 absolute text-red-400 hover:text-red-700 font-semibold hover:bg-red-100 p-0.5 rounded-lg cursor-pointer right-2 top-0" />
           <ul>
-            {noti.length ? (
+            {notis.length ? (
               <>
-                {noti.map((item, index) => (
+                {notis.map((item, index) => (
                   <li
                     key={`adicmoskd-${index}`}
                     className="border-b border-slate-200 dark:border-slate-700 last:border-0"
                   >
                     <span className="block py-2 px-4 hover:bg-slate-50 dark:hover:bg-slate-700/20">
-                      <span className="block text-sm mb-2">
-                        📣
+                      <span className="text-sm mb-2">
                         {item.type === "new"
                           ? "🆕"
                           : item.type === "announce"
@@ -125,13 +134,13 @@ const DropdownNotifications = ({
                           : item.type === "success"
                           ? "🟢"
                           : "🔥"}{" "}
-                        <span className="font-medium block text-slate-800 dark:text-slate-100">
+                        <span className="font-medium text-slate-800 dark:text-slate-100">
                           {item.title}
                         </span>{" "}
                         {item.text}
                       </span>
                       <span className="block text-xs font-medium text-slate-400 dark:text-slate-500">
-                        {item.date}
+                        {item.createdAt}
                       </span>
                     </span>
                   </li>

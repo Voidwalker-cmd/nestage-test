@@ -9,6 +9,7 @@ import { MiningProvider } from "../../../context/MiningContext";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { MiningData, RootState } from "../../../types/types";
 import { useDispatch } from "../../../hooks";
+import { useDisconnect } from "@thirdweb-dev/react";
 
 const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
 
@@ -17,6 +18,7 @@ const DashboardLayout = () => {
     (state) => state.client
   );
   const dispatch = useDispatch();
+  const disconnect = useDisconnect();
   const { id } = useParams();
   const navigate = useNavigate();
   const { address, getMinings } = useStateContext();
@@ -51,20 +53,26 @@ const DashboardLayout = () => {
         if (userRefDetails.id <= 0 && userId <= 0 && !hasMining) {
           sessionStorage.removeItem("temp");
           sessionStorage.removeItem("MV938aO");
+          sessionStorage.removeItem("Ihs6JSg");
           localStorage.removeItem("ref");
+          await disconnect();
           navigate("/");
         }
       }
       if (id === undefined) {
         sessionStorage.removeItem("temp");
         sessionStorage.removeItem("MV938aO");
+        sessionStorage.removeItem("Ihs6JSg");
         localStorage.removeItem("ref");
+        await disconnect();
         navigate("/");
       }
       if (address.length > 10 && address !== id) {
         sessionStorage.removeItem("temp");
         sessionStorage.removeItem("MV938aO");
+        sessionStorage.removeItem("Ihs6JSg");
         localStorage.removeItem("ref");
+        await disconnect();
         navigate("/");
       }
       // if (address !== undefined) {

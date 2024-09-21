@@ -586,8 +586,7 @@ export const saveStat = createAsyncThunk<
   { rejectValue: Types.ErrorResponse }
 >("client/get-stat", async ({ type, amount }, thunkAPI) => {
   try {
-    const d = { type, amount };
-    const { data } = await Axios.post<string>(`save-stat`, d);
+    const { data } = await Axios.post<string>(`save-stat`, { type, amount });
     return data;
   } catch (err) {
     const error = err as Types.ExtendedError;

@@ -1,6 +1,6 @@
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { sendNotiResponse, initialState } from "../../types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getNoti } from "../../features/admin";
 import { useDispatch } from "../../hooks";
 
@@ -9,28 +9,34 @@ const useTypedSelector: TypedUseSelectorHook<initialState> = useSelector;
 const NotificationCreateCard = () => {
   const dispatch = useDispatch();
   const { noti } = useTypedSelector((state) => state.admin);
+  const [notis, setNotis] = useState<sendNotiResponse[]>([]);
 
   const initX = async () => {
-    await dispatch(getNoti())
-  }
+    await dispatch(getNoti());
+  };
 
   useEffect(() => {
-    initX()
-  }, [])
+    initX();
+  }, []);
+
+  useEffect(() => {
+    const flipped = noti.slice().reverse();
+    setNotis(flipped);
+  }, [noti]);
 
   return (
     <>
       <div className="bg-white shadow-xl rounded-lg p-5 w-full lg:w-1/2">
-        <h3 className="text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+        <h3 className="text-tremor-title py-3 font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
           Pasted Notification
         </h3>
         <>
-          <div className="flex flex-col gap-3">
-            {noti.length ? (
-              noti.map((item: sendNotiResponse, i: number) => (
+          <div className="flex flex-col gap-3 overflow-y-scroll h-[450px] pr-3">
+            {notis.length ? (
+              notis.map((item: sendNotiResponse, i: number) => (
                 <div key={`lauionasddw-${i}`}>
-                  <div className="flex flex-row lg:flex-col gap-1 border border-tremor-default rounded-lg p-4">
-                    <div className="">
+                  <div className="flex flex-row lg:flex-col gap-1 items-start justify-between border border-tremor-default rounded-lg p-4 w-full">
+                    <div className="flex flex-col lg:flex-row items-center justify-center">
                       <h5 className="mr-2 text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
                         User ID:
                       </h5>
@@ -38,7 +44,7 @@ const NotificationCreateCard = () => {
                         {item.userId}
                       </p>
                     </div>
-                    <div className="">
+                    <div className="flex flex-col lg:flex-row items-center justify-center">
                       <h5 className="mr-2 text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
                         Type:
                       </h5>
@@ -59,7 +65,7 @@ const NotificationCreateCard = () => {
                         {item.type}
                       </p>
                     </div>
-                    <div className="">
+                    <div className="flex flex-col lg:flex-row items-center justify-center">
                       <h5 className="mr-2 text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
                         Title:
                       </h5>
@@ -67,7 +73,7 @@ const NotificationCreateCard = () => {
                         {item.title}
                       </p>
                     </div>
-                    <div className="">
+                    <div className="flex flex-col lg:flex-row items-center justify-center">
                       <h5 className="mr-2 text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
                         Text:
                       </h5>
@@ -75,7 +81,7 @@ const NotificationCreateCard = () => {
                         {item.text}
                       </p>
                     </div>
-                    <div className="">
+                    <div className="flex flex-col lg:flex-row items-center justify-center">
                       <h5 className="mr-2 text-tremor-title font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
                         Created:
                       </h5>
