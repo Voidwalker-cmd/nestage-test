@@ -209,7 +209,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
             ) : (
               ""
             )}
-            {checkState || checkState2 ? (
+            {checkState === "done" || checkState2 === "done" ? (
               <Button
                 onClick={Nav}
                 color="secondary"

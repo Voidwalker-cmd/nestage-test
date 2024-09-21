@@ -631,9 +631,9 @@ export interface ClientState {
   loading: boolean;
   transactionState: string;
   regLoading: boolean;
-  checkState: boolean;
+  checkState: string;
   checkFailed: boolean;
-  checkState2: boolean;
+  checkState2: string;
   checkFailed2: boolean;
   isAuthenticated: boolean;
   error: boolean;
@@ -648,9 +648,9 @@ const initialState: ClientState = {
   loading: !!0,
   regLoading: !!0,
   transactionState: "init",
-  checkState: !!0,
+  checkState: "init",
   checkFailed: !!0,
-  checkState2: !!0,
+  checkState2: "init",
   checkFailed2: !!0,
   isAuthenticated: !!0,
   error: !!0,
@@ -717,14 +717,14 @@ const clientSlice = createSlice({
         // state.isAuthenticated = !!0;
       })
       .addCase(setCheeckState.pending, (state) => {
-        state.checkState = !!1;
+        state.checkState = "pending";
       })
       .addCase(setCheeckState.fulfilled, (state) => {
-        state.checkState = !!0;
+        state.checkState = "done";
         state.checkFailed = !!0;
       })
       .addCase(setCheeckState.rejected, (state) => {
-        state.checkState = !!0;
+        state.checkState = "failed";
         state.checkFailed = !!1;
       })
       .addCase(setTransactionState.pending, (state) => {
@@ -808,18 +808,18 @@ const clientSlice = createSlice({
       })
       .addCase(getRef.pending, (state) => {
         state.loading = !!1;
-        state.checkState2 = !!1;
+        state.checkState2 = "pending";
       })
       .addCase(getRef.fulfilled, (state, action) => {
         state.loading = !!0;
         state.userRef = action.payload;
-        state.checkState2 = !!0;
+        state.checkState2 = "done";
         state.checkFailed2 = !!0;
         // state.isAuthenticated = !!1;
       })
       .addCase(getRef.rejected, (state) => {
         state.loading = !!0;
-        state.checkState2 = !!0;
+        state.checkState2 = "failed";
         state.checkFailed2 = !!1;
         // state.error = !!1;
         // state.isAuthenticated = !!0;
