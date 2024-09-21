@@ -131,7 +131,7 @@ const NotificationCreateCard = () => {
     ti.length <= 6 &&
     ti[ti.length - 1].length > 0 &&
     te.length >= 2 &&
-    te.length <= 6 &&
+    te.length <= 15 &&
     te[te.length - 1].length > 0 &&
     text &&
     type &&
@@ -202,7 +202,7 @@ const NotificationCreateCard = () => {
               name="title"
               value={title}
               onChange={handleChange}
-              placeholder="Must be more than 2 words less than 6"
+              placeholder="Must be more than 2 words less than 15"
               className="mt-2 w-full rounded-tremor-small sm:max-w-lg"
             />
           </div>

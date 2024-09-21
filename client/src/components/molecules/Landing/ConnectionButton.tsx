@@ -89,8 +89,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
         } catch (err) {
           refValue && localStorage.setItem("ref", refValue);
         }
-
-        // console.log(`Ref parameter (${refValue}) stored in local storage.`);
       }
     }
   };
@@ -151,7 +149,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
 
   // const Connect = async (): Promise<void> => {
   //   const connection = await connect();
-  //   console.log(connection);
 
   //   // navigate(`/user/${address}`, { replace: !!1 });
   // };
@@ -161,7 +158,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     searchString: string
   ): boolean => {
     const result = array.filter((obj) => obj.staker === searchString);
-    console.log(result);
     const res = result.length ? !!1 : !!0;
     return res;
   };
@@ -169,7 +165,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   const initX = async () => {
     let result = !!0;
     const x = await getMinings();
-    console.log(x);
     if (x.length) result = searchStringInArray(x, address);
 
     setHasMining(result);
@@ -356,7 +351,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
           theme={customTheme}
           onConnect={async (w) => {
             const c = await w.getChainId();
-            // console.log("wallet c", w);
             if (!chainList.includes(c)) {
               toast(
                 "error",
@@ -368,9 +362,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
               const a = await w.getAddress();
               const b = await w.getBalance();
               // await initX();
-              setTimeout(() => {
-                // console.log(hasMining);
-              }, 1500);
+              setTimeout(() => {}, 1500);
               storeReferral();
               setUserAddress(a);
               setWalletBalance(BigNumber.from(b.value));

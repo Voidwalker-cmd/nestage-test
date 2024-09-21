@@ -459,13 +459,13 @@ export const getUsers = createAsyncThunk<
 });
 
 export const sendNoti = createAsyncThunk<
-  string,
+  Types.sendNotiResponse[],
   Types.sendNotiParams,
   { rejectValue: Types.ErrorResponse }
 >("admin/save-noti", async ({ users, type, title, text }, thunkAPI) => {
   try {
     const d = { users, type, title, text };
-    const { data } = await Axios.post<string>(`save-noti`, {
+    const { data } = await Axios.post<Types.sendNotiResponse[]>(`save-noti`, {
       d,
     });
     return data;
@@ -639,6 +639,18 @@ const adminSlice = createSlice({
         state.stats = [...action.payload];
       })
       .addCase(getStats.rejected, (state) => {
+        state.loading = !!0;
+        // state.error = !!1;
+        state.isAuthenticated = !!0;
+      })
+      .addCase(sendNoti.pending, (state) => {
+        state.loading = !!1;
+      })
+      .addCase(sendNoti.fulfilled, (state, action) => {
+        state.loading = !!0;
+        state.noti = action.payload;
+      })
+      .addCase(sendNoti.rejected, (state) => {
         state.loading = !!0;
         // state.error = !!1;
         state.isAuthenticated = !!0;

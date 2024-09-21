@@ -17,6 +17,7 @@ import { useDispatch } from "../hooks";
 import {
   createPay,
   createRefs,
+  getRef,
   getWallets,
   removeRef,
   saveStat,
@@ -133,7 +134,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         return data.uplines.find((upline) => upline.code === code);
       }
 
-      const upline = findUplineByCode(userRef, userRef.uplineCode);
+      const refs = await dispatch(getRef({ address: address }));
+
+      const upline = findUplineByCode(refs, refs.uplineCode);
 
       if (upline) {
         const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
@@ -250,15 +253,11 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     const xamt = eth.utils.parseUnits(amount.toString(), "ether");
 
     try {
-      const aa = getReferral();
-      const code = aa === null ? null : String(aa);
-      let details: Types.createRefParams = { selfAddress: address };
-      details = code !== null ? { ...details, code } : { ...details };
+      const refs = await dispatch(getRef({ address: address }));
 
-      const refs = await dispatch(createRefs(details));
-
+      let info;
+      let createNewRef = !!1;
       if (refs.meta.requestStatus == "fulfilled") {
-        let info;
         // address _refOne,
         // address _refTwo,
         // address _refThree,
@@ -266,17 +265,14 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         // uint _level,
         // bool _hasUpline
         const drefs = refs?.payload;
+
         const up = drefs?.upline;
         const list = drefs?.uplines;
-        const selfCode = drefs?.code;
-        sessionStorage.setItem("temp", selfCode);
-        log(refAdminWallet);
+        const code = drefs?.code;
+        sessionStorage.setItem("temp", code);
 
-        if (up === 0) {
-          info = [[], refAdminWallet];
-        } else {
+        if (up >= 1) {
           const yy = [];
-          log(list);
           const l = list.length;
           for (let i = 0; i < l; i++) {
             yy.push(list[i].address);
@@ -288,109 +284,112 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           }
 
           info = [yy, refAdminWallet];
+          createNewRef = !!0;
         }
+      } else {
+        createNewRef = !!1;
+        info = [[], refAdminWallet];
+      }
 
-        // [address[] memory _users, address _refAdmin, uint256 amount]
-        alert(
-          `--> list of users = ${info[0]}, admin wallet = ${info[1]}, amount in wei = ${xamt}, amount in busd = ${amount}`
+      // [address[] memory _users, address _refAdmin, uint256 amount]
+      alert(
+        `--> list of users = ${info![0]}, admin wallet = ${
+          info![1]
+        }, amount in wei = ${xamt}, amount in busd = ${amount}`
+      );
+      const _rates = [40, 20, 15];
+      const SCALE = 100;
+      const yamt = Number(eth.utils.formatEther(xamt));
+
+      // const allow = await contract?.call("setAllowance", info);
+      //  (allow);
+
+      // const data = await contract?.call("startNewReferral", info, {
+      //   value: xamt,
+      // });
+
+      if (window.ethereum) {
+        const provider = new eth.providers.Web3Provider(window.ethereum, "any");
+        const signer = provider.getSigner();
+
+        const contract = new eth.Contract(nestageAddress, BUSD_ABI, signer);
+        const busdContract = new eth.Contract(
+          contractAddress,
+          PLAIN_BUSD_ABI,
+          signer
         );
-        const _rates = [40, 20, 15];
-        const SCALE = 100;
-        const yamt = Number(eth.utils.formatEther(xamt));
 
-        // const allow = await contract?.call("setAllowance", info);
-        //  (allow);
-
-        // const data = await contract?.call("startNewReferral", info, {
-        //   value: xamt,
-        // });
-
-        if (window.ethereum) {
-          const provider = new eth.providers.Web3Provider(
-            window.ethereum,
-            "any"
-          );
-          const signer = provider.getSigner();
-
-          const contract = new eth.Contract(nestageAddress, BUSD_ABI, signer);
-          const busdContract = new eth.Contract(
-            contractAddress,
-            PLAIN_BUSD_ABI,
-            signer
+        try {
+          const currentAllowance = await busdContract.allowance(
+            await signer.getAddress(),
+            nestageAddress
           );
 
-          try {
-            const currentAllowance = await busdContract.allowance(
-              await signer.getAddress(),
-              nestageAddress
-            );
+          // if (!currentAllowance.lt(amount)) {
+          const approvalTx = await busdContract.approve(nestageAddress, xamt);
+          dispatch(setTransactionState({ state: "approving" }));
+          await approvalTx.wait();
+          dispatch(setTransactionState({ state: "approved" }));
 
-            // if (!currentAllowance.lt(amount)) {
-            const approvalTx = await busdContract.approve(nestageAddress, xamt);
-            dispatch(setTransactionState({ state: "approving" }));
-            await approvalTx.wait();
-            dispatch(setTransactionState({ state: "approved" }));
+          setTimeout(() => {
+            dispatch(setTransactionState({ state: "awaiting payment" }));
+          }, 1200);
+          // }
 
-            setTimeout(() => {
-              dispatch(setTransactionState({ state: "awaiting payment" }));
-            }, 1200);
-            // }
+          const gasLimit = 500000;
+          // [address[] memory _users, address _refAdmin, uint256 amount]
+          const tx = await contract.startNewReferral(info![0], info![1], xamt, {
+            gasLimit,
+          });
 
-            const gasLimit = 500000;
-            // [address[] memory _users, address _refAdmin, uint256 amount]
-            const tx = await contract.startNewReferral(info[0], info[1], xamt, {
-              gasLimit,
-            });
+          dispatch(setTransactionState({ state: "paying" }));
 
-            dispatch(setTransactionState({ state: "paying" }));
+          await tx.wait();
 
-            await tx.wait();
-
-            if (tx.status === 1 || tx.status === "1") {
-              const l: string[] = info[0];
-              const len = l.length;
-              let amt,
-                didTransfer = 0;
-              if (len > 0) {
-                for (let i = 0; i < len; i++) {
-                  amt = Number(amount) * (_rates[i] / SCALE);
-                  didTransfer += amt;
-                  await dispatch(
-                    createPay({ address: l[i], amount: String(amt) })
-                  );
-                }
-                const adminReward = Number(amount) - didTransfer;
-                dispatch(
-                  createPay({
-                    address: String(refAdminWallet),
-                    amount: String(adminReward),
-                  })
-                );
-              } else {
-                dispatch(
-                  createPay({
-                    address: String(refAdminWallet),
-                    amount: String(amount),
-                  })
+          if (tx.status === 1 || tx.status === "1") {
+            const l: string[] = info![0];
+            const len = l.length;
+            let amt,
+              didTransfer = 0;
+            if (len > 0) {
+              for (let i = 0; i < len; i++) {
+                amt = Number(amount) * (_rates[i] / SCALE);
+                didTransfer += amt;
+                await dispatch(
+                  createPay({ address: l[i], amount: String(amt) })
                 );
               }
-              dispatch(saveStat({ type: "levelTwo", amount }));
-              dispatch(setTransactionState({ state: "payed" }));
-              result = {
-                isLoading: false,
-                data: tx,
-                error: null,
-              };
+              const adminReward = Number(amount) - didTransfer;
+              dispatch(
+                createPay({
+                  address: String(refAdminWallet),
+                  amount: String(adminReward),
+                })
+              );
             } else {
-              const idx = sessionStorage.getItem("temp");
-              const rm = async () => {
-                const resx = await dispatch(removeRef({ id: String(idx) }));
-                resx.meta.requestStatus !== "rejected" &&
-                  sessionStorage.removeItem("temp");
-              };
-              if (idx) rm();
+              dispatch(
+                createPay({
+                  address: String(refAdminWallet),
+                  amount: String(amount),
+                })
+              );
             }
-          } catch (error) {
+            dispatch(saveStat({ type: "levelTwo", amount }));
+            dispatch(setTransactionState({ state: "payed" }));
+            createNewRef &&
+              (async () => {
+                const aa = getReferral();
+                const code = aa === null ? null : String(aa);
+                let details: Types.createRefParams = { selfAddress: address };
+                details = code !== null ? { ...details, code } : { ...details };
+                await dispatch(createRefs(details));
+              })();
+            result = {
+              isLoading: false,
+              data: tx,
+              error: null,
+            };
+          } else {
             const idx = sessionStorage.getItem("temp");
             const rm = async () => {
               const resx = await dispatch(removeRef({ id: String(idx) }));
@@ -399,16 +398,17 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             };
             if (idx) rm();
           }
-        } else {
-          console.error("Dapp is not installed!");
+        } catch (error) {
+          const idx = sessionStorage.getItem("temp");
+          const rm = async () => {
+            const resx = await dispatch(removeRef({ id: String(idx) }));
+            resx.meta.requestStatus !== "rejected" &&
+              sessionStorage.removeItem("temp");
+          };
+          if (idx) rm();
         }
       } else {
-        console.log("Request rejected!!");
-        result = {
-          isLoading: false,
-          data: "rejected",
-          error: "rejected",
-        };
+        console.error("Dapp is not installed!");
       }
     } catch (error) {
       const errorMessage = (error as Error).message;
@@ -426,7 +426,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
   const getMinings = async (): Promise<Types.ParsedMiningData[]> => {
     dispatch(setCheckState({ state: "loading" }));
     const minings: Types.MiningData[] = await contract?.call("getAllStakes");
-    console.log("minings", minings);
 
     try {
       // Parse the raw mining data
@@ -439,11 +438,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           profit: eth.utils.formatUnits(mining.profit, "ether"),
         })
       );
-      console.log("pass");
 
       return parsedMining || [];
     } catch (error: any) {
-      console.log("failed");
       dispatch(setCheckState({ state: "not-found" }));
       return [];
     }
