@@ -6,7 +6,7 @@ import {
   RootState,
 } from "../../../types/types";
 import { useStateContext } from "../../../context/Web3";
-import { shortenHexString } from "../../../config/utils";
+import { shortenHexString, uuid } from "../../../config/utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BigNumber, ethers } from "ethers";
@@ -16,6 +16,7 @@ import {
   lightTheme,
   darkTheme,
   useConnectionStatus,
+  useDisconnect,
 } from "@thirdweb-dev/react";
 import Modal from "../Dashboard/Modal";
 import { useModal } from "../../../context/ModalContext";
@@ -46,6 +47,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     checkFailed2,
   } = useTypedSelector((state) => state.client);
   const { address, status, balance, getMinings } = useStateContext();
+  const disconnect = useDisconnect();
   const [hasMining, setHasMining] = useState<boolean>(!!0);
   const [hasRef, setHasRef] = useState<boolean>(!!0);
   const [userAddress, setUserAddress] = useState<string>("");
@@ -173,9 +175,28 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     setHasRef(userRefDetails.id > 0);
   };
 
+  const setSession = () => {
+    sessionStorage.setItem("Ihs6JSg", uuid());
+  };
+
+  const checkSession = async () => {
+    const cs = sessionStorage.getItem("Ihs6JSg");
+    if (!cs) {
+      await disconnect();
+    }
+  };
+
   useEffect(() => {
     if (connectionStatus === "connected") initX();
-  }, [connectionStatus, userRefDetails, getMinings]);
+  }, [connectionStatus, userRefDetails]);
+
+  useEffect(() => {
+    if (connectionStatus === "connected") setSession();
+  }, [connectionStatus]);
+
+  useEffect(() => {
+    checkSession();
+  }, []);
 
   useEffect(() => {
     setDevice(detectDeviceType());
