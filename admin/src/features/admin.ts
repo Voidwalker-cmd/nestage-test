@@ -648,7 +648,7 @@ const adminSlice = createSlice({
       })
       .addCase(sendNoti.fulfilled, (state, action) => {
         state.loading = !!0;
-        state.noti = action.payload.result;
+        state.noti = action.payload;
       })
       .addCase(sendNoti.rejected, (state) => {
         state.loading = !!0;
