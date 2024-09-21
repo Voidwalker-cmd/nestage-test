@@ -20,7 +20,7 @@ import {
   getWallets,
   removeRef,
   saveStat,
-  setCheeckState,
+  setCheckState,
   setTransactionState,
 } from "../features/client";
 import { getReferral } from "../helper/functions/SaveReferralLink";
@@ -424,7 +424,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
   // Function to get minings
   const getMinings = async (): Promise<Types.ParsedMiningData[]> => {
-    dispatch(setCheeckState({ state: "loading" }));
+    dispatch(setCheckState({ state: "loading" }));
     const minings: Types.MiningData[] = await contract?.call("getAllStakes");
 
     try {
@@ -438,10 +438,12 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           profit: eth.utils.formatUnits(mining.profit, "ether"),
         })
       );
+      console.log("pass");
 
       return parsedMining || [];
     } catch (error: any) {
-      dispatch(setCheeckState({ state: "not-found" }));
+      console.log("failed");
+      dispatch(setCheckState({ state: "not-found" }));
       return [];
     }
   };

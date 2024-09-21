@@ -464,7 +464,7 @@ export const setTransactionState = createAsyncThunk<
   }
 });
 
-export const setCheeckState = createAsyncThunk<
+export const setCheckState = createAsyncThunk<
   string,
   { state: string },
   { rejectValue: { message: string } }
@@ -716,14 +716,14 @@ const clientSlice = createSlice({
         // state.error = !!1;
         // state.isAuthenticated = !!0;
       })
-      .addCase(setCheeckState.pending, (state) => {
+      .addCase(setCheckState.pending, (state) => {
         state.checkState = "pending";
       })
-      .addCase(setCheeckState.fulfilled, (state) => {
+      .addCase(setCheckState.fulfilled, (state) => {
         state.checkState = "done";
         state.checkFailed = !!0;
       })
-      .addCase(setCheeckState.rejected, (state) => {
+      .addCase(setCheckState.rejected, (state) => {
         state.checkState = "failed";
         state.checkFailed = !!1;
       })

@@ -159,6 +159,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     searchString: string
   ): boolean => {
     const result = array.filter((obj) => obj.staker === searchString);
+    console.log(result);
     const res = result.length ? !!1 : !!0;
     return res;
   };
