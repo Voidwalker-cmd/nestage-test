@@ -164,6 +164,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   };
 
   const initX = async () => {
+    await dispatch(getRef({ address: userAddress }));
     let result = !!0;
     const x = await getMinings();
     console.log(x);
@@ -193,7 +194,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   });
 
   useEffect(() => {
-    console.log("hhh");
     if (connectionStatus === "connected") console.log("weee");
     if (connectionStatus === "connected") initX();
   }, [connectionStatus, userRefDetails]);
