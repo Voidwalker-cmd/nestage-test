@@ -176,7 +176,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   };
 
   const setSession = () => {
-    sessionStorage.setItem("Ihs6JSg", uuid());
+    sessionStorage.setItem("Ihs6JSg", uuid);
   };
 
   const checkSession = async () => {
