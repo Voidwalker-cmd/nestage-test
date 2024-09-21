@@ -110,7 +110,10 @@ const DropdownNotifications = ({
           <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase pt-1.5 pb-2 px-4">
             Notifications
           </div>
-          <CloseIconL className="w-6 h-6 absolute text-red-400 hover:text-red-700 font-semibold hover:bg-red-100 p-0.5 rounded-lg cursor-pointer right-2 top-0" />
+          <CloseIconL
+            ref={trigger}
+            className="w-6 h-6 absolute text-red-400 hover:text-red-700 font-semibold hover:bg-red-100 p-0.5 rounded-lg cursor-pointer right-2 top-0"
+          />
           <ul>
             {notis.length ? (
               <>
