@@ -818,7 +818,7 @@ const clientSlice = createSlice({
       })
       .addCase(getRef.rejected, (state) => {
         state.loading = !!0;
-        state.checkState2 = "failed";
+        state.checkState2 = "done";
         state.checkFailed2 = !!1;
         // state.error = !!1;
         // state.isAuthenticated = !!0;

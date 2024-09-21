@@ -172,12 +172,13 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     const x = await getMinings();
     console.log(x);
     if (x.length) result = searchStringInArray(x, address);
-    result
-      ? dispatch(setCheckState({ checkState: "done" }))
-      : dispatch(setCheckState({ checkState: "failed" }));
 
     setHasMining(result);
     setHasRef(userRefDetails.id > 0);
+
+    result
+      ? dispatch(setCheckState({ checkState: "done" }))
+      : dispatch(setCheckState({ checkState: "done" }));
   };
 
   const setSession = () => {
@@ -266,7 +267,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
             ) : (
               <Button
                 color="secondary"
-                className="rounded-lg bg-opacity-70 text-primary font-semibold tracking-wide font-primary border-2 border-secondary hover:border-primary hover:bg-transparent transition-all"
+                className="cursor-not-allowed rounded-lg bg-opacity-70 text-primary font-semibold tracking-wide font-primary border-2 border-secondary hover:border-primary hover:bg-transparent transition-all"
                 variant="shadow"
                 radius={radius}
                 isDisabled
