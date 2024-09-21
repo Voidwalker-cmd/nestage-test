@@ -175,7 +175,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
 
   useEffect(() => {
     if (connectionStatus === "connected") initX();
-  }, [connectionStatus, userRefDetails]);
+  }, [connectionStatus, userRefDetails, getMinings]);
 
   useEffect(() => {
     setDevice(detectDeviceType());
