@@ -158,6 +158,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     searchString: string
   ): boolean => {
     const result = array.filter((obj) => obj.staker === searchString);
+    console.log(result);
     const res = result.length ? !!1 : !!0;
     return res;
   };
@@ -165,6 +166,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   const initX = async () => {
     let result = !!0;
     const x = await getMinings();
+    console.log(x);
     if (x.length) result = searchStringInArray(x, address);
 
     setHasMining(result);
@@ -181,8 +183,18 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
       await disconnect();
     }
   };
+  console.log({
+    hasMining,
+    hasRef,
+    checkState,
+    checkState2,
+    userRefDetails,
+    connectionStatus,
+  });
 
   useEffect(() => {
+    console.log("hhh");
+    if (connectionStatus === "connected") console.log("weee");
     if (connectionStatus === "connected") initX();
   }, [connectionStatus, userRefDetails]);
 
@@ -237,6 +249,9 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
                 size={size}
               >
                 {hasMining || hasRef ? "Login" : "Register"}
+                {/* {checkState === "done" || checkState2 === "done"
+                  ? "Login"
+                  : "Register"} */}
               </Button>
             ) : (
               <Button
