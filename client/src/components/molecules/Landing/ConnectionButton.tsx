@@ -26,7 +26,7 @@ import { useNotification } from "../../atom/Notification/NotificationProvider";
 import { Helper } from "../../../helper";
 // import { storeReferral } from "../../../helper/functions/SaveReferralLink";
 import { useDispatch } from "../../../hooks";
-import { getRef, saveReferral } from "../../../features/client";
+import { getRef, saveReferral, setCheckState } from "../../../features/client";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { SiteUrl } from "../../../const";
 
@@ -163,12 +163,18 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     return res;
   };
 
-  const initX = async () => {
+  const initY = async () => {
     await dispatch(getRef({ address: userAddress }));
+  };
+
+  const initX = async () => {
     let result = !!0;
     const x = await getMinings();
     console.log(x);
     if (x.length) result = searchStringInArray(x, address);
+    result
+      ? dispatch(setCheckState({ checkState: "done" }))
+      : dispatch(setCheckState({ checkState: "failed" }));
 
     setHasMining(result);
     setHasRef(userRefDetails.id > 0);
@@ -205,6 +211,10 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   useEffect(() => {
     checkSession();
   }, []);
+
+  useEffect(() => {
+    if (connectionStatus === "connected") initY();
+  }, [connectionStatus]);
 
   useEffect(() => {
     setDevice(detectDeviceType());

@@ -424,7 +424,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
   // Function to get minings
   const getMinings = async (): Promise<Types.ParsedMiningData[]> => {
-    dispatch(setCheckState({ state: "loading" }));
     const minings: Types.MiningData[] = await contract?.call("getAllStakes");
 
     try {

@@ -469,7 +469,7 @@ export const setCheckState = createAsyncThunk<
   { state: string },
   { rejectValue: { message: string } }
 >("client/set-check-state", async ({ state }, thunkAPI) => {
-  const stateTypes = ["loading"];
+  const stateTypes = ["done"];
   if (stateTypes.includes(state)) {
     return state;
   } else {
