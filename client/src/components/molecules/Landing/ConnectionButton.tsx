@@ -163,15 +163,11 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
     return res;
   };
 
-  const initY = async () => {
-    await dispatch(getRef({ address: userAddress }));
-  };
-
   const initX = async () => {
     let result = !!0;
     const x = await getMinings();
     console.log(x);
-    if (x.length) result = searchStringInArray(x, address);
+    if (x.length) result = await searchStringInArray(x, address);
 
     setHasMining(result);
     setHasRef(userRefDetails.id > 0);
@@ -191,19 +187,29 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
       await disconnect();
     }
   };
-  console.log({
+
+  useEffect(() => {
+    console.log({
+      hasMining,
+      hasRef,
+      checkState,
+      checkState2,
+      userRefDetails,
+      connectionStatus,
+    });
+  }, [
     hasMining,
     hasRef,
     checkState,
     checkState2,
     userRefDetails,
     connectionStatus,
-  });
+  ]);
 
   useEffect(() => {
-    if (connectionStatus === "connected") console.log("weee");
-    if (connectionStatus === "connected") initX();
-  }, [connectionStatus, userRefDetails]);
+    // if (connectionStatus === "connected") initX();
+    if (connectionStatus === "connected" && checkState2 === "done") initX();
+  }, [checkState2]);
 
   useEffect(() => {
     if (connectionStatus === "connected") setSession();
@@ -212,10 +218,6 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
   useEffect(() => {
     checkSession();
   }, []);
-
-  useEffect(() => {
-    if (connectionStatus === "connected") initY();
-  }, [connectionStatus]);
 
   useEffect(() => {
     setDevice(detectDeviceType());
@@ -250,21 +252,7 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
             ) : (
               ""
             )}
-            {checkState === "done" || checkState2 === "done" ? (
-              <Button
-                onClick={Nav}
-                color="secondary"
-                className="rounded-lg bg-opacity-70 text-primary font-semibold tracking-wide font-primary border-2 border-secondary hover:border-primary hover:bg-transparent hover:text-white transition-all"
-                variant="shadow"
-                radius={radius}
-                size={size}
-              >
-                {hasMining || hasRef ? "Login" : "Register"}
-                {/* {checkState === "done" || checkState2 === "done"
-                  ? "Login"
-                  : "Register"} */}
-              </Button>
-            ) : (
+            {checkState !== "done" && checkState2 !== "done" ? (
               <Button
                 color="secondary"
                 className="cursor-not-allowed rounded-lg bg-opacity-70 text-primary font-semibold tracking-wide font-primary border-2 border-secondary hover:border-primary hover:bg-transparent transition-all"
@@ -297,6 +285,20 @@ const ConnectionButton: React.FC<ConnectButtonProps> = ({
                 }
               >
                 Loading...
+              </Button>
+            ) : (
+              <Button
+                onClick={Nav}
+                color="secondary"
+                className="rounded-lg bg-opacity-70 text-primary font-semibold tracking-wide font-primary border-2 border-secondary hover:border-primary hover:bg-transparent hover:text-white transition-all"
+                variant="shadow"
+                radius={radius}
+                size={size}
+              >
+                {hasMining || hasRef ? "Login" : "Register"}
+                {/* {checkState === "done" || checkState2 === "done"
+                  ? "Login"
+                  : "Register"} */}
               </Button>
             )}
           </div>

@@ -723,7 +723,7 @@ const clientSlice = createSlice({
         state.checkFailed = !!0;
       })
       .addCase(setCheckState.rejected, (state) => {
-        state.checkState = "failed";
+        state.checkState = "done";
         state.checkFailed = !!1;
       })
       .addCase(setTransactionState.pending, (state) => {
