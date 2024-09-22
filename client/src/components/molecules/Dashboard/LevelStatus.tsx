@@ -33,7 +33,7 @@ const LevelStatus = () => {
   return (
     <>
       <div className="hidden lg:flex justify-between items-center gap-4 mr-5 py-4">
-        <div className="flex items-center justify-center gap-3 font-primary tracking-wider">
+        <div className="flex items-center justify-center gap-3 font-primary text-black dark:text-white tracking-wider">
           Level 1{" "}
           {hasMining ? (
             <div className="size-3 rounded-full bg-secondary">
@@ -43,7 +43,7 @@ const LevelStatus = () => {
             <div className="size-3 rounded-full bg-gray-400"></div>
           )}
         </div>
-        <div className="flex items-center justify-center gap-3 border-l-2 border-gray-300 px-4  font-primary tracking-wider">
+        <div className="flex items-center justify-center gap-3 border-l-2 border-gray-300 px-4  font-primary text-black dark:text-white tracking-wider">
           Level 2{" "}
           {userRefDetails.id > 0 ? (
             <div className="size-3 rounded-full bg-secondary">

@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { ParsedMiningData } from "../types/types";
+import { ParsedMiningData, RootState } from "../types/types";
 import { useStateContext } from "./Web3";
 import { Helper } from "../helper";
+import { TypedUseSelectorHook, useSelector } from "react-redux";
 
 interface MiningContextType {
   minings: ParsedMiningData[];
@@ -17,9 +18,12 @@ export const useMiningContext = () => {
   return context;
 };
 
+const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
+
 export const MiningProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const { userId } = useTypedSelector((state) => state.client);
   const { address, getMinings } = useStateContext();
   const [minings, setMinings] = useState<ParsedMiningData[]>([]);
 
@@ -45,7 +49,7 @@ export const MiningProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     initX();
-  }, []);
+  }, [userId]);
 
   return (
     <MiningContext.Provider value={{ minings }}>
