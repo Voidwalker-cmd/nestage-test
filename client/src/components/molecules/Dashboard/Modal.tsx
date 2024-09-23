@@ -237,6 +237,7 @@ const Modal = () => {
 
   const handlePayReferral = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    console.log("ready");
     const amt = SiteUrl.includes("testing") ? 2 : 10;
 
     const busd: string = await getBUSD();
