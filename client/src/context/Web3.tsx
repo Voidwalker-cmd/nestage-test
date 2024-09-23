@@ -345,6 +345,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
+          log({ tx });
 
           if (tx.status === 1 || tx.status === "1") {
             const l: string[] = info![0];
