@@ -294,6 +294,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         info = [[], refAdminWallet];
       }
 
+      const _rates = [40, 20, 15];
+      const SCALE = 100;
+
       if (window.ethereum) {
         const provider = new eth.providers.Web3Provider(window.ethereum, "any");
         const signer = provider.getSigner();
@@ -340,6 +343,15 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           const { result: Txx } = Tx;
 
           if (Txx.status === "1") {
+            createNewRef &&
+              (async () => {
+                const aa = getReferral();
+                const code = aa === null ? null : String(aa);
+                let details: Types.createRefParams = { selfAddress: address };
+                details = code !== null ? { ...details, code } : { ...details };
+                await dispatch(createRefs(details));
+              })();
+
             const l: string[] = info![0];
             const len = l.length;
             let amt,
@@ -369,14 +381,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             }
             dispatch(saveStat({ type: "levelTwo", amount }));
             dispatch(setTransactionState({ state: "payed" }));
-            createNewRef &&
-              (async () => {
-                const aa = getReferral();
-                const code = aa === null ? null : String(aa);
-                let details: Types.createRefParams = { selfAddress: address };
-                details = code !== null ? { ...details, code } : { ...details };
-                await dispatch(createRefs(details));
-              })();
             result = {
               isLoading: !!0,
               data: !!1,
