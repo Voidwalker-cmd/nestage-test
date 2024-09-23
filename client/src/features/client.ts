@@ -580,6 +580,54 @@ export const getNotifications = createAsyncThunk<
   }
 });
 
+export const validateHash = createAsyncThunk<
+  Types.validateHashResponse,
+  Types.validateHashParams,
+  { rejectValue: Types.ErrorResponse }
+>("client/validateHash", async ({ txHash }, thunkAPI) => {
+  try {
+    const { data } = await Axios.get<Types.validateHashResponse>(
+      `verify-hash?txHash=${txHash}`
+    );
+    return data;
+  } catch (err) {
+    const error = err as Types.ExtendedError;
+    if (error?.response?.status === 403) {
+      const errors: Types.ErrorResponse = {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText.toUpperCase(),
+        detail: null,
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else if (error?.response?.status === 400) {
+      const errors: Types.ErrorResponse = {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText.toUpperCase(),
+        detail: error?.response?.data,
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else if (error?.message === "Network Error") {
+      const errors: Types.ErrorResponse = {
+        status: 0,
+        statusText: null,
+        detail:
+          "Unable to process your request, We are working to fix this issue.",
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else {
+      const errors: Types.ErrorResponse = {
+        status: null,
+        statusText: null,
+        detail: error?.response?.data,
+      };
+      if (error?.response?.status === 302) {
+        window.location.replace("/");
+      }
+      return thunkAPI.rejectWithValue(errors);
+    }
+  }
+});
+
 export const saveStat = createAsyncThunk<
   string,
   Types.saveStatParams,
