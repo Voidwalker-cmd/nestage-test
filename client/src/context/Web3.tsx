@@ -23,6 +23,7 @@ import {
   saveStat,
   setCheckState,
   setTransactionState,
+  validateHash,
 } from "../features/client";
 import { getReferral } from "../helper/functions/SaveReferralLink";
 import { Percent } from "lucide-react";
@@ -210,9 +211,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          const Tx: Types.bscscan = await Axios.get<Types.bscscan>(
-            `https://api.bscscan.com/api?module=transaction&action=gettxreceiptstatus&txhash=${tx.hash}&apikey=U2UQSM9B353BKWYJYHATQ5GEPDDBTXQNKZ`
-          );
+          const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
+
+          const Tx: Types.bscscan = verifiedTx?.payload;
 
           const { result: Txx } = Tx;
 
@@ -336,9 +337,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          const Tx: Types.bscscan = await Axios.get<Types.bscscan>(
-            `https://api.bscscan.com/api?module=transaction&action=gettxreceiptstatus&txhash=${tx.hash}&apikey=U2UQSM9B353BKWYJYHATQ5GEPDDBTXQNKZ`
-          );
+          const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
+
+          const Tx: Types.bscscan = verifiedTx?.payload;
 
           const { result: Txx } = Tx;
 

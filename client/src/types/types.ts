@@ -401,3 +401,9 @@ export type bscscan = {
     status: string;
   };
 };
+
+export interface validateHashResponse extends bscscan {}
+
+export interface validateHashParams {
+  txHash: string;
+}
