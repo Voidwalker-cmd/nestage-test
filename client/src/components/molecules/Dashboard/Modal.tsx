@@ -287,7 +287,7 @@ const Modal = () => {
         }
       } else {
         createNewUser();
-        if (result.data?.confirmations > 0) {
+        if (result.data) {
           setTxt("Finishing your request");
           const referralCode = generateRandomString(8);
 
