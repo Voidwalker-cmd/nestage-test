@@ -249,23 +249,14 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     }
 
     const { amount } = form;
-
     const xamt = eth.utils.parseUnits(amount.toString(), "ether");
 
     try {
       const refs = await dispatch(getRef({ address: address }));
-
       let info;
       let createNewRef = !!1;
-      if (refs.meta.requestStatus == "fulfilled") {
-        // address _refOne,
-        // address _refTwo,
-        // address _refThree,
-        // address _refAdmin,
-        // uint _level,
-        // bool _hasUpline
+      if (refs.meta.requestStatus === "fulfilled") {
         const drefs = refs?.payload;
-
         const up = drefs?.upline;
         const list = drefs?.uplines;
         const code = drefs?.code;
@@ -276,11 +267,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           const l = list.length;
           for (let i = 0; i < l; i++) {
             yy.push(list[i].address);
-            // yy.push(list[i].address);
-            // if (list[i]) {
-            // } else {
-            //   yy.push(nullAddress);
-            // }
           }
 
           info = [yy, refAdminWallet];
@@ -291,27 +277,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         info = [[], refAdminWallet];
       }
 
-      // [address[] memory _users, address _refAdmin, uint256 amount]
-      alert(
-        `--> list of users = ${info![0]}, admin wallet = ${
-          info![1]
-        }, amount in wei = ${xamt}, amount in busd = ${amount}`
-      );
-      const _rates = [40, 20, 15];
-      const SCALE = 100;
-      const yamt = Number(eth.utils.formatEther(xamt));
-
-      // const allow = await contract?.call("setAllowance", info);
-      //  (allow);
-
-      // const data = await contract?.call("startNewReferral", info, {
-      //   value: xamt,
-      // });
-
       if (window.ethereum) {
         const provider = new eth.providers.Web3Provider(window.ethereum, "any");
         const signer = provider.getSigner();
-
         const contract = new eth.Contract(nestageAddress, BUSD_ABI, signer);
         const busdContract = new eth.Contract(
           contractAddress,
@@ -325,7 +293,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             nestageAddress
           );
 
-          // if (!currentAllowance.lt(amount)) {
           const approvalTx = await busdContract.approve(nestageAddress, xamt);
           dispatch(setTransactionState({ state: "approving" }));
           await approvalTx.wait();
@@ -334,14 +301,26 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           setTimeout(() => {
             dispatch(setTransactionState({ state: "awaiting payment" }));
           }, 1200);
-          // }
 
-          const gasLimit = 500000;
-          // [address[] memory _users, address _refAdmin, uint256 amount]
+          const gasEstimate = await contract.estimateGas.startNewReferral(
+            info![0],
+            info![1],
+            xamt
+          );
+
+          const gasLimit = Math.ceil(gasEstimate.toNumber() * 1.1);
+
+          const gasPrice = await provider.getGasPrice();
+
+          const gasFee = gasPrice.mul(gasEstimate);
+          console.log(`Estimated Gas Fee (in wei): ${gasFee.toString()}`);
+
+          const gasFeeInEther = eth.utils.formatEther(gasFee);
+          console.log(`Estimated Gas Fee (in ETH): ${gasFeeInEther}`);
+
           const tx = await contract.startNewReferral(info![0], info![1], xamt, {
             gasLimit,
           });
-
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
@@ -423,12 +402,10 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     return result;
   };
 
-  // Function to get minings
   const getMinings = async (): Promise<Types.ParsedMiningData[]> => {
     const minings: Types.MiningData[] = await contract?.call("getAllStakes");
 
     try {
-      // Parse the raw mining data
       const parsedMining = minings?.map(
         (mining): Types.ParsedMiningData => ({
           staker: mining.staker,
@@ -462,7 +439,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     }
   }
 
-  // Set up the context value
   const value: Types.StateContextValue = {
     address,
     contract,
@@ -476,7 +452,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     getBUSDBalance,
   };
 
-  // Fetch address on component mount or when userAddress changes
   useEffect(() => {
     const fetchAddress = async () => {
       if (userAddress) {
@@ -489,12 +464,10 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     fetchAddress();
   }, [userAddress]);
 
-  // Provide the context value to children components
   return (
     <StateContext.Provider value={value}>{children}</StateContext.Provider>
   );
 };
 
-// Custom hook to consume the context value
 export const useStateContext = (): Types.StateContextValue | undefined =>
   React.useContext(StateContext);
