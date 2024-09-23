@@ -393,3 +393,11 @@ export interface saveStatParams {
   type: string;
   amount: string;
 }
+
+export type bscscan = {
+  status: string;
+  message: string;
+  result: {
+    status: string;
+  };
+};

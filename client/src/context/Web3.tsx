@@ -10,7 +10,7 @@ import {
 } from "@thirdweb-dev/react";
 // import {  } from "@thirdweb-dev/sdk";
 import * as Types from "../types";
-import { eth } from "../config/utils";
+import { Axios, eth } from "../config/utils";
 import { CLIENT_ID, NETWORK_MODE, tokenAddress } from "./../config/index";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import { useDispatch } from "../hooks";
@@ -99,7 +99,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     dispatch(setTransactionState({ state: "initializing" }));
     dispatch(getWallets({ blank: 0 }));
     let result: Types.MiningResult = {
-      isLoading: true,
+      isLoading: !!1,
       data: null,
       error: null,
     };
@@ -108,7 +108,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     } catch (error) {
       const errorMessage = (error as Error).message;
       result = {
-        isLoading: false,
+        isLoading: !!0,
         data: null,
         error: errorMessage,
       };
@@ -180,7 +180,18 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           }, 1200);
           // }
 
-          const gasLimit = 500000;
+          const gasEstimate = await contract.estimateGas.startNewStake(
+            amt,
+            adminWallet,
+            startDate,
+            endDate,
+            prt,
+            payUpline.hasUpline,
+            payUpline.uplineAddress,
+            payUpline.pay
+          );
+
+          const gasLimit = Math.ceil(gasEstimate.toNumber() * 1.1);
 
           const tx = await contract.startNewStake(
             amt,
@@ -199,13 +210,19 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          if (tx.status === 1 || tx.status === "1") {
+          const Tx: Types.bscscan = await Axios.get<Types.bscscan>(
+            `https://api.bscscan.com/api?module=transaction&action=gettxreceiptstatus&txhash=${tx.hash}&apikey=U2UQSM9B353BKWYJYHATQ5GEPDDBTXQNKZ`
+          );
+
+          const { result: Txx } = Tx;
+
+          if (Txx.status === "1") {
             dispatch(saveStat({ type: "levelOne", amount }));
             dispatch(setTransactionState({ state: "payed" }));
 
             result = {
-              isLoading: false,
-              data: tx,
+              isLoading: !!0,
+              data: !!1,
               error: null,
             };
           }
@@ -218,7 +235,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     } catch (error) {
       const errorMessage = (error as Error).message;
       result = {
-        isLoading: false,
+        isLoading: !!0,
         data: null,
         error: errorMessage,
       };
@@ -232,7 +249,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
   ): Promise<Types.MiningResult> => {
     dispatch(getWallets({ blank: 0 }));
     let result: Types.MiningResult = {
-      isLoading: true,
+      isLoading: !!1,
       data: null,
       error: null,
     };
@@ -242,7 +259,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     } catch (error) {
       const errorMessage = (error as Error).message;
       result = {
-        isLoading: false,
+        isLoading: !!0,
         data: null,
         error: errorMessage,
       };
@@ -297,7 +314,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "approving" }));
           await approvalTx.wait();
           dispatch(setTransactionState({ state: "approved" }));
-          log(approvalTx);
 
           setTimeout(() => {
             dispatch(setTransactionState({ state: "awaiting payment" }));
@@ -311,23 +327,19 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
           const gasLimit = Math.ceil(gasEstimate.toNumber() * 1.1);
 
-          const gasPrice = await provider.getGasPrice();
-
-          const gasFee = gasPrice.mul(gasEstimate);
-          log(`Estimated Gas Fee (in wei): ${gasFee.toString()}`);
-
-          const gasFeeInEther = eth.utils.formatEther(gasFee);
-          log(`Estimated Gas Fee (in ETH): ${gasFeeInEther}`);
-
           const tx = await contract.startNewReferral(info![0], info![1], xamt, {
             gasLimit,
           });
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          log({ tx });
+          const Tx: Types.bscscan = await Axios.get<Types.bscscan>(
+            `https://api.bscscan.com/api?module=transaction&action=gettxreceiptstatus&txhash=${tx.hash}&apikey=U2UQSM9B353BKWYJYHATQ5GEPDDBTXQNKZ`
+          );
 
-          if (tx.status === 1 || tx.status === "1") {
+          const { result: Txx } = Tx;
+
+          if (Txx.status === "1") {
             const l: string[] = info![0];
             const len = l.length;
             let amt,
@@ -366,8 +378,8 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
                 await dispatch(createRefs(details));
               })();
             result = {
-              isLoading: false,
-              data: tx,
+              isLoading: !!0,
+              data: !!1,
               error: null,
             };
           } else {
@@ -394,7 +406,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     } catch (error) {
       const errorMessage = (error as Error).message;
       result = {
-        isLoading: false,
+        isLoading: !!0,
         data: null,
         error: errorMessage,
       };
