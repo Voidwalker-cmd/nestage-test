@@ -297,6 +297,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "approving" }));
           await approvalTx.wait();
           dispatch(setTransactionState({ state: "approved" }));
+          log(approvalTx);
 
           setTimeout(() => {
             dispatch(setTransactionState({ state: "awaiting payment" }));
@@ -313,10 +314,10 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           const gasPrice = await provider.getGasPrice();
 
           const gasFee = gasPrice.mul(gasEstimate);
-          console.log(`Estimated Gas Fee (in wei): ${gasFee.toString()}`);
+          log(`Estimated Gas Fee (in wei): ${gasFee.toString()}`);
 
           const gasFeeInEther = eth.utils.formatEther(gasFee);
-          console.log(`Estimated Gas Fee (in ETH): ${gasFeeInEther}`);
+          log(`Estimated Gas Fee (in ETH): ${gasFeeInEther}`);
 
           const tx = await contract.startNewReferral(info![0], info![1], xamt, {
             gasLimit,
