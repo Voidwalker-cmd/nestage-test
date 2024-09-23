@@ -13,12 +13,13 @@ import {
 import { NETWORK_MODE } from "./config";
 import { useModal } from "./context/ModalContext";
 import NotificationProvider from "./components/atom/Notification/NotificationProvider";
-import { getRef, getUser, getWallets } from "./features/client";
+import { getRef, getUser, getWallets, validateHash } from "./features/client";
 import { useDispatch } from "./hooks";
 import { useStateContext } from "./context/Web3";
 import Terms from "./components/organisms/Landing/Terms";
 import Documentation from "./components/organisms/Landing/Documentation";
 import Exaggerate from "./components/organisms/Landing/Exaggerate";
+import { bscscan } from "./types";
 
 // lazyly importing all pages to aid the spinner
 const Home = lazy(() => import("./pages/Home"));
@@ -59,6 +60,15 @@ const App = () => {
   }, [chainId, isModalVisible]);
 
   const initX = async () => {
+    const verifiedTx = await dispatch(
+      validateHash({
+        txHash:
+          "0x03c938154259fab2c6b229a40336a2d399600c0c170e2534523ba5279d22bf98",
+      })
+    );
+
+    const Tx: bscscan = verifiedTx?.payload;
+    console.log(Tx);
     dispatch(getWallets({ blank: 0 }));
     if (!address.includes("Loading Address") && address !== "") {
       dispatch(getRef({ address }));
