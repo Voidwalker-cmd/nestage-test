@@ -130,29 +130,29 @@ const Modal = () => {
     }
 
     // TODO: Remove 6am
-    if (SITE_MODE === "live") {
-      const lmt = SiteUrl.includes("testing") ? 2 : 10;
-      if (Number(amt) < lmt) {
-        setErr(
-          `Amount should be above ${SiteUrl.includes("testing") ? "2" : "10"}.`
-        );
-        return 0;
-      }
-    }
+    // if (SITE_MODE === "live") {
+    //   const lmt = SiteUrl.includes("testing") ? 2 : 10;
+    //   if (Number(amt) < lmt) {
+    //     setErr(
+    //       `Amount should be above ${SiteUrl.includes("testing") ? "2" : "10"}.`
+    //     );
+    //     return 0;
+    //   }
+    // }
 
     const busd: string = await getBUSD();
 
     // TODO: Remove 6am
-    if (busd === "0.0") {
-      setErr("Oops, Your BUSD balance is low.");
-      return 0;
-    }
+    // if (busd === "0.0") {
+    //   setErr("Oops, Your BUSD balance is low.");
+    //   return 0;
+    // }
 
     // TODO: Remove 6am
-    if (Number(busd) < Number(amt)) {
-      setErr("Oops, Insufficient BUSD balance.");
-      return 0;
-    }
+    // if (Number(busd) < Number(amt)) {
+    //   setErr("Oops, Insufficient BUSD balance.");
+    //   return 0;
+    // }
 
     let sym: "BTC" | "ETH" | "USDT" | "MATIC" | "BNB" = symbol ?? "BNB";
     sym = symbol?.toLowerCase().includes("bnb") ? "BNB" : sym;
@@ -160,10 +160,10 @@ const Modal = () => {
     // const getBal = (await Helper.convertToUSD(sym, Number(balance))) ?? 0;
     // const getBal = Number(balance);
     // TODO: Remove later by 6am
-    if (parseFloat(String(balance)) === 0) {
-      setErr(`Oops, Not enough BNB to pay for gasfee.`);
-      return 0;
-    }
+    // if (parseFloat(String(balance)) === 0) {
+    //   setErr(`Oops, Not enough BNB to pay for gasfee.`);
+    //   return 0;
+    // }
 
     setIsLoading(!!1);
     let p: string | number = Number(amt) * 0.4;
@@ -227,8 +227,8 @@ const Modal = () => {
           //   .catch((error) => {
           //     console.error("Dispatch rejected:", error);
           //   });
-          navigate(`/user/${address}`);
         }
+        navigate(`/user/${address}`);
       }
       setIsLoading(!!0);
       hideModal();
