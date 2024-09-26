@@ -194,7 +194,7 @@ const Modal = () => {
       setTxt("Awaiting Confirmations");
       if (result.isLoading) {
         setTxt("Awaiting Confirmations");
-      } else if (result.error) {
+      } else if (result.error !== "x") {
         console.error("Error:", result.error);
       } else {
         createNewUser();
@@ -243,16 +243,16 @@ const Modal = () => {
     const busd: string = await getBUSD();
 
     //TODO: Revert this
-    if (busd === "0.0") {
-      setErr("Oops, Your BUSD balance is low.");
-      return 0;
-    }
+    // if (busd === "0.0") {
+    //   setErr("Oops, Your BUSD balance is low.");
+    //   return 0;
+    // }
 
     //TODO: Revert this
-    if (Number(busd) < amt) {
-      setErr("Oops, Insufficient BUSD balance.");
-      return 0;
-    }
+    // if (Number(busd) < amt) {
+    //   setErr("Oops, Insufficient BUSD balance.");
+    //   return 0;
+    // }
 
     // let sym: "BTC" | "ETH" | "USDT" | "MATIC" | "BNB" = symbol ?? "BNB";
     // sym = symbol?.toLowerCase().includes("bnb") ? "BNB" : sym;
@@ -261,10 +261,10 @@ const Modal = () => {
     // const getBal = Number(balance);
 
     //TODO: Revert this
-    if (parseFloat(String(balance)) === 0) {
-      setErr(`Oops, Not enough BNB to pay for gasfee.`);
-      return 0;
-    }
+    // if (parseFloat(String(balance)) === 0) {
+    //   setErr(`Oops, Not enough BNB to pay for gasfee.`);
+    //   return 0;
+    // }
 
     setIsLoading(!!1);
     // const y = sym.toLocaleLowerCase();
@@ -274,7 +274,7 @@ const Modal = () => {
       setTxt("Awaiting Confirmations");
       if (result.isLoading) {
         setTxt("Awaiting Confirmations");
-      } else if (result.error) {
+      } else if (result.error !== "x") {
         console.error("Error:", result.error);
         const idx = sessionStorage.getItem("temp");
         if (idx) {
