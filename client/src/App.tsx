@@ -13,13 +13,12 @@ import {
 import { NETWORK_MODE } from "./config";
 import { useModal } from "./context/ModalContext";
 import NotificationProvider from "./components/atom/Notification/NotificationProvider";
-import { getRef, getUser, getWallets, validateHash } from "./features/client";
+import { getRef, getUser, getWallets } from "./features/client";
 import { useDispatch } from "./hooks";
 import { useStateContext } from "./context/Web3";
 import Terms from "./components/organisms/Landing/Terms";
 import Documentation from "./components/organisms/Landing/Documentation";
 import Exaggerate from "./components/organisms/Landing/Exaggerate";
-import { bscscan } from "./types";
 
 // lazyly importing all pages to aid the spinner
 const Home = lazy(() => import("./pages/Home"));
