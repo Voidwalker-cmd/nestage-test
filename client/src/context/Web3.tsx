@@ -314,29 +314,29 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             nestageAddress
           );
 
-          // const approvalTx = await busdContract.approve(nestageAddress, xamt);
+          const approvalTx = await busdContract.approve(nestageAddress, xamt);
           dispatch(setTransactionState({ state: "approving" }));
-          // await approvalTx.wait();
+          await approvalTx.wait();
           dispatch(setTransactionState({ state: "approved" }));
 
           setTimeout(() => {
             dispatch(setTransactionState({ state: "awaiting payment" }));
           }, 1200);
 
-          // const gasEstimate = await contract.estimateGas.startNewReferral(
-          //   info![0],
-          //   info![1],
-          //   xamt
-          // );
+          const gasEstimate = await contract.estimateGas.startNewReferral(
+            info![0],
+            info![1],
+            xamt
+          );
 
-          // const gasLimit = Math.ceil(gasEstimate.toNumber() * 1.1);
+          const gasLimit = Math.ceil(gasEstimate.toNumber() * 1.1);
 
-          // const tx = await contract.startNewReferral(info![0], info![1], xamt, {
-          //   gasLimit,
-          // });
+          const tx = await contract.startNewReferral(info![0], info![1], xamt, {
+            gasLimit,
+          });
           dispatch(setTransactionState({ state: "paying" }));
 
-          // await tx.wait();
+          await tx.wait();
           // const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
 
           // const Tx: Types.bscscan = verifiedTx?.payload;

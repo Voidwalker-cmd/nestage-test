@@ -159,7 +159,7 @@ const Modal = () => {
 
     // const getBal = (await Helper.convertToUSD(sym, Number(balance))) ?? 0;
     // const getBal = Number(balance);
-    // TODO: Remove 6am
+    // TODO: Remove later by 6am
     if (parseFloat(String(balance)) === 0) {
       setErr(`Oops, Not enough BNB to pay for gasfee.`);
       return 0;
@@ -243,16 +243,16 @@ const Modal = () => {
     const busd: string = await getBUSD();
 
     //TODO: Revert this
-    // if (busd === "0.0") {
-    //   setErr("Oops, Your BUSD balance is low.");
-    //   return 0;
-    // }
+    if (busd === "0.0") {
+      setErr("Oops, Your BUSD balance is low.");
+      return 0;
+    }
 
     //TODO: Revert this
-    // if (Number(busd) < amt) {
-    //   setErr("Oops, Insufficient BUSD balance.");
-    //   return 0;
-    // }
+    if (Number(busd) < amt) {
+      setErr("Oops, Insufficient BUSD balance.");
+      return 0;
+    }
 
     // let sym: "BTC" | "ETH" | "USDT" | "MATIC" | "BNB" = symbol ?? "BNB";
     // sym = symbol?.toLowerCase().includes("bnb") ? "BNB" : sym;
@@ -261,10 +261,10 @@ const Modal = () => {
     // const getBal = Number(balance);
 
     //TODO: Revert this
-    // if (parseFloat(String(balance)) === 0) {
-    //   setErr(`Oops, Not enough BNB to pay for gasfee.`);
-    //   return 0;
-    // }
+    if (parseFloat(String(balance)) === 0) {
+      setErr(`Oops, Not enough BNB to pay for gasfee.`);
+      return 0;
+    }
 
     setIsLoading(!!1);
     // const y = sym.toLocaleLowerCase();
