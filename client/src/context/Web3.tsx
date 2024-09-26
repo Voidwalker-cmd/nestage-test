@@ -211,22 +211,22 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
+          // const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
 
-          const Tx: Types.bscscan = verifiedTx?.payload;
+          // const Tx: Types.bscscan = verifiedTx?.payload;
 
-          const { result: Txx } = Tx;
+          // const { result: Txx } = Tx;
 
-          if (Txx.status === "1") {
-            dispatch(saveStat({ type: "levelOne", amount }));
-            dispatch(setTransactionState({ state: "payed" }));
+          // if (Txx.status === "1") {
+          dispatch(saveStat({ type: "levelOne", amount }));
+          dispatch(setTransactionState({ state: "payed" }));
 
-            result = {
-              isLoading: !!0,
-              data: !!1,
-              error: null,
-            };
-          }
+          result = {
+            isLoading: !!0,
+            data: !!1,
+            error: null,
+          };
+          // }
         } catch (error) {
           console.error("Error calling startNewStake:", error);
         }
@@ -337,65 +337,54 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           dispatch(setTransactionState({ state: "paying" }));
 
           await tx.wait();
-          const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
+          // const verifiedTx = await dispatch(validateHash({ txHash: tx.hash }));
 
-          const Tx: Types.bscscan = verifiedTx?.payload;
+          // const Tx: Types.bscscan = verifiedTx?.payload;
 
-          const { result: Txx } = Tx;
+          // const { result: Txx } = Tx;
 
-          if (Txx.status === "1") {
-            createNewRef &&
-              (async () => {
-                const aa = getReferral();
-                const code = aa === null ? null : String(aa);
-                let details: Types.createRefParams = { selfAddress: address };
-                details = code !== null ? { ...details, code } : { ...details };
-                await dispatch(createRefs(details));
-              })();
+          // if (Txx.status === "1") {
+          createNewRef &&
+            (async () => {
+              const aa = getReferral();
+              const code = aa === null ? null : String(aa);
+              let details: Types.createRefParams = { selfAddress: address };
+              details = code !== null ? { ...details, code } : { ...details };
+              await dispatch(createRefs(details));
+            })();
 
-            const l: string[] = info![0];
-            const len = l.length;
-            let amt,
-              didTransfer = 0;
-            if (len > 0) {
-              for (let i = 0; i < len; i++) {
-                amt = Number(amount) * (_rates[i] / SCALE);
-                didTransfer += amt;
-                await dispatch(
-                  createPay({ address: l[i], amount: String(amt) })
-                );
-              }
-              const adminReward = Number(amount) - didTransfer;
-              dispatch(
-                createPay({
-                  address: String(refAdminWallet),
-                  amount: String(adminReward),
-                })
-              );
-            } else {
-              dispatch(
-                createPay({
-                  address: String(refAdminWallet),
-                  amount: String(amount),
-                })
-              );
+          const l: string[] = info![0];
+          const len = l.length;
+          let amt,
+            didTransfer = 0;
+          if (len > 0) {
+            for (let i = 0; i < len; i++) {
+              amt = Number(amount) * (_rates[i] / SCALE);
+              didTransfer += amt;
+              await dispatch(createPay({ address: l[i], amount: String(amt) }));
             }
-            dispatch(saveStat({ type: "levelTwo", amount }));
-            dispatch(setTransactionState({ state: "payed" }));
-            result = {
-              isLoading: !!0,
-              data: !!1,
-              error: null,
-            };
+            const adminReward = Number(amount) - didTransfer;
+            dispatch(
+              createPay({
+                address: String(refAdminWallet),
+                amount: String(adminReward),
+              })
+            );
           } else {
-            const idx = sessionStorage.getItem("temp");
-            const rm = async () => {
-              const resx = await dispatch(removeRef({ id: String(idx) }));
-              resx.meta.requestStatus !== "rejected" &&
-                sessionStorage.removeItem("temp");
-            };
-            if (idx) rm();
+            dispatch(
+              createPay({
+                address: String(refAdminWallet),
+                amount: String(amount),
+              })
+            );
           }
+          dispatch(saveStat({ type: "levelTwo", amount }));
+          dispatch(setTransactionState({ state: "payed" }));
+          result = {
+            isLoading: !!0,
+            data: !!1,
+            error: null,
+          };
         } catch (error) {
           const idx = sessionStorage.getItem("temp");
           const rm = async () => {
