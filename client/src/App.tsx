@@ -60,20 +60,6 @@ const App = () => {
   }, [chainId, isModalVisible]);
 
   const initX = async () => {
-    const verifiedTx = await dispatch(
-      validateHash({
-        txHash:
-          "0x03c938154259fab2c6b229a40336a2d399600c0c170e2534523ba5279d22bf98",
-      })
-    );
-
-    const Tx: bscscan = verifiedTx?.payload;
-
-    const { result: Txx } = Tx;
-
-    if (Txx.status === "1") {
-      alert("works as expected A");
-    }
     dispatch(getWallets({ blank: 0 }));
     if (!address.includes("Loading Address") && address !== "") {
       dispatch(getRef({ address }));
