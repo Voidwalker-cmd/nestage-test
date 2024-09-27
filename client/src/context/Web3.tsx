@@ -277,6 +277,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     try {
       let info;
       let createNewRef = !!1;
+      console.log({ refCode });
 
       if (refCode) {
         const refs = await dispatch(getRefByCode({ code: refCode }));
@@ -294,16 +295,14 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
             for (let i = 0; i < l; i++) {
               yy.push(list[i].address);
             }
-
             info = [yy, refAdminWallet];
-            createNewRef = !!0;
+          } else {
+            info = [[fstUplineAddress], refAdminWallet];
           }
         } else {
-          createNewRef = !!1;
           info = [[], refAdminWallet];
         }
       } else {
-        createNewRef = !!1;
         info = [[], refAdminWallet];
       }
 
