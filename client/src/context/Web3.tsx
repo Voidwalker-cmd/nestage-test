@@ -18,6 +18,7 @@ import {
   createPay,
   createRefs,
   getRef,
+  getRefByCode,
   getWallets,
   removeRef,
   saveStat,
@@ -271,26 +272,35 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     const { amount } = form;
     const xamt = eth.utils.parseUnits(amount.toString(), "ether");
 
+    const refCode = localStorage.getItem("ref");
+
     try {
-      const refs = await dispatch(getRef({ address: address }));
       let info;
       let createNewRef = !!1;
-      if (refs.meta.requestStatus === "fulfilled") {
-        const drefs = refs?.payload;
-        const up = drefs?.upline;
-        const list = drefs?.uplines;
-        const code = drefs?.code;
-        sessionStorage.setItem("temp", code);
 
-        if (up >= 1) {
-          const yy = [];
-          const l = list.length;
-          for (let i = 0; i < l; i++) {
-            yy.push(list[i].address);
+      if (refCode) {
+        const refs = await dispatch(getRefByCode({ code: refCode }));
+        if (refs.meta.requestStatus === "fulfilled") {
+          const drefs = refs?.payload;
+          const up = drefs?.upline;
+          const fstUpline = drefs?.code;
+          const fstUplineAddress = drefs?.address;
+          const list = drefs?.uplines;
+          // sessionStorage.setItem("temp", code);
+
+          if (up >= 1) {
+            const yy = [fstUplineAddress];
+            const l = list.length;
+            for (let i = 0; i < l; i++) {
+              yy.push(list[i].address);
+            }
+
+            info = [yy, refAdminWallet];
+            createNewRef = !!0;
           }
-
-          info = [yy, refAdminWallet];
-          createNewRef = !!0;
+        } else {
+          createNewRef = !!1;
+          info = [[], refAdminWallet];
         }
       } else {
         createNewRef = !!1;

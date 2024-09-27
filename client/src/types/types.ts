@@ -330,12 +330,19 @@ export interface getRefResponse {
   downlines: Downline;
 }
 
+export interface getRefByCodeResponse
+  extends Omit<getRefResponse, "downlines"> {}
+
 export interface removeRefParams {
   id: number | string;
 }
 
 export interface getSelfRefParams {
   address: string;
+}
+
+export interface getRefByCodeParams {
+  code: string;
 }
 
 export interface createRefParams {
