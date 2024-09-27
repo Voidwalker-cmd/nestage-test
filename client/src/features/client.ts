@@ -151,6 +151,56 @@ export const getRef = createAsyncThunk<
   }
 });
 
+export const getRefByCode = createAsyncThunk<
+  Types.getRefByCodeResponse,
+  Types.getRefByCodeParams,
+  { rejectValue: Types.ErrorResponse }
+>("client/get-ref-by-code", async ({ code }, thunkAPI) => {
+  try {
+    // Axios.defaults.headers.common["Content-Type"] = "application/json";
+    // Axios.defaults.headers.common["Authorization"] = `Bearer ${ER()}`;
+    const { data } = await Axios.get<Types.getRefByCodeResponse>(
+      `g-referral?code=${code}`
+    );
+    return data;
+  } catch (err) {
+    const error = err as Types.ExtendedError;
+    if (error?.response?.status === 403) {
+      const errors: Types.ErrorResponse = {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText.toUpperCase(),
+        detail: null,
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else if (error?.response?.status === 400) {
+      const errors: Types.ErrorResponse = {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText.toUpperCase(),
+        detail: error?.response?.data,
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else if (error?.message === "Network Error") {
+      const errors: Types.ErrorResponse = {
+        status: 0,
+        statusText: null,
+        detail:
+          "Unable to process your request, We are working to fix this issue.",
+      };
+      return thunkAPI.rejectWithValue(errors);
+    } else {
+      const errors: Types.ErrorResponse = {
+        status: null,
+        statusText: null,
+        detail: error?.response?.data,
+      };
+      if (error?.response?.status === 302) {
+        window.location.replace("/");
+      }
+      return thunkAPI.rejectWithValue(errors);
+    }
+  }
+});
+
 export const getWallets = createAsyncThunk<
   Types.adminWalletResponse,
   Types.blankParams,
