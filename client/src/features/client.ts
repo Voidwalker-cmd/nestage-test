@@ -533,15 +533,15 @@ export const saveReferral = createAsyncThunk<
   { rejectValue: Types.ErrorResponse }
 >("client/save-referral", async ({ refValue }, thunkAPI) => {
   try {
-    // const { data } = await Axios.get<Types.SaveReferralresponse>(
-    //   `get-ref?ref=${refValue}`
-    // );
-    const url = `${API_URL}get-ref?ref=${refValue}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data: Types.SaveReferralresponse = await response.json();
+    const { data } = await Axios.get<Types.SaveReferralresponse>(
+      `get-ref?ref=${refValue}`
+    );
+    // const url = `${API_URL}get-ref?ref=${refValue}`;
+    // const response = await fetch(url);
+    // if (!response.ok) {
+    //   throw new Error(`HTTP error! status: ${response.status}`);
+    // }
+    // const data: Types.SaveReferralresponse = await response.json();
     return data;
   } catch (err) {
     refValue && localStorage.setItem("ref", refValue);
