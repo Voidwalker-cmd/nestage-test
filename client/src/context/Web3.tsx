@@ -27,7 +27,7 @@ import {
   validateHash,
 } from "../features/client";
 import { getReferral } from "../helper/functions/SaveReferralLink";
-import { Percent } from "lucide-react";
+// import { Percent } from "lucide-react";
 import { Helper } from "../helper";
 import BUSD_ABI from "../web3/NestageNw.json";
 import PLAIN_BUSD_ABI from "../web3/PlainBUSD_ABI.json";
@@ -129,6 +129,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         uplineAddress: nullAddress,
         pay,
       };
+
       function findUplineByCode(
         data: Types.getRefResponse,
         code: string
@@ -136,20 +137,38 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
         return data.uplines.find((upline) => upline.code === code);
       }
 
-      const refs = await dispatch(getRef({ address: address }));
+      if (!window.location.pathname.includes("/user/")) {
+        const refCode = localStorage.getItem("ref");
+        if (refCode) {
+          const refs = await dispatch(getRefByCode({ code: refCode }));
+          if (refs.meta.requestStatus === "fulfilled") {
+            const drefs = refs?.payload;
+            const fstUplineAddress = drefs?.address;
 
-      if (refs.meta.requestStatus === "fulfilled") {
-        const upline = findUplineByCode(refs.payload, refs.payload.uplineCode);
-
-        if (upline) {
-          const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
-          pay = eth.utils.parseUnits(bonus.toString(), "ether");
-          payUpline = {
-            hasUpline: !!1,
-            uplineAddress: upline.address,
-            pay,
-          };
+            const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
+            pay = eth.utils.parseUnits(bonus.toString(), "ether");
+            payUpline = {
+              hasUpline: !!1,
+              uplineAddress: fstUplineAddress,
+              pay,
+            };
+          }
         }
+
+        // const upline = findUplineByCode(
+        //   refs.payload,
+        //   refs.payload.uplineCode
+        // );
+
+        // if (upline) {
+        //   const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
+        //   pay = eth.utils.parseUnits(bonus.toString(), "ether");
+        //   payUpline = {
+        //     hasUpline: !!1,
+        //     uplineAddress: upline.address,
+        //     pay,
+        //   };
+        // }
       }
 
       // const data = await contract?.call("startNewStake", sending, {
@@ -277,7 +296,6 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
     try {
       let info;
       let createNewRef = !!1;
-      console.log({ refCode });
 
       if (refCode) {
         const refs = await dispatch(getRefByCode({ code: refCode }));
