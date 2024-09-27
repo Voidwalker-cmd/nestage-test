@@ -137,16 +137,18 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
       const refs = await dispatch(getRef({ address: address }));
 
-      const upline = findUplineByCode(refs, refs.uplineCode);
+      if (refs.meta.requestStatus === "fulfilled") {
+        const upline = findUplineByCode(refs, refs.uplineCode);
 
-      if (upline) {
-        const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
-        pay = eth.utils.parseUnits(bonus.toString(), "ether");
-        payUpline = {
-          hasUpline: !!1,
-          uplineAddress: upline.address,
-          pay,
-        };
+        if (upline) {
+          const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
+          pay = eth.utils.parseUnits(bonus.toString(), "ether");
+          payUpline = {
+            hasUpline: !!1,
+            uplineAddress: upline.address,
+            pay,
+          };
+        }
       }
 
       // const data = await contract?.call("startNewStake", sending, {
@@ -218,8 +220,8 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
           // const { result: Txx } = Tx;
 
           // if (Txx.status === "1") {
-          dispatch(saveStat({ type: "levelOne", amount }));
           dispatch(setTransactionState({ state: "payed" }));
+          dispatch(saveStat({ type: "levelOne", amount }));
 
           result = {
             isLoading: !!0,
