@@ -139,7 +139,7 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
       const refs = await dispatch(getRef({ address: address }));
 
       if (refs.meta.requestStatus === "fulfilled") {
-        const upline = findUplineByCode(refs, refs.uplineCode);
+        const upline = findUplineByCode(refs.payload, refs.payload.uplineCode);
 
         if (upline) {
           const bonus = SiteUrl.includes("testing") ? 0.5 : 1.5;
