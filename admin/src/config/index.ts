@@ -1,6 +1,5 @@
 import { SiteUrl } from "../const";
 
-export const CLIENT_ID = import.meta.env.VITE_TEMPLATE_CLIENT_ID;
 export const SITE_MODE = import.meta.env.VITE_SITE_MODE;
 export const NETWORK_MODE = import.meta.env.VITE_NETWORK_MODE;
 const TEST_NESTAGE = import.meta.env.VITE_TEST_NESTAGE;
