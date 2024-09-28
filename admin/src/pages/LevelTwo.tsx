@@ -91,7 +91,7 @@ const LevelOne = () => {
                     className="even:bg-tremor-background-muted even:dark:bg-dark-tremor-background-muted"
                   >
                     <TableCell className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                      {i}
+                      {i + 1}
                     </TableCell>
                     <TableCell className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
                       {item.userId}

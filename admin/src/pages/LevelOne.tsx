@@ -16,6 +16,8 @@ import { checkDate, convertDateTime, Toast } from "../utils/libs";
 import { Checkbox } from "@headlessui/react";
 import { Static } from "../assets/img";
 
+// const log = console.log
+
 const LevelOne = () => {
   const { status, getStakes, payReferral } = useStateContext();
 
@@ -47,20 +49,20 @@ const LevelOne = () => {
   const payRefs = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     payBtn: string = "single",
-    endDate: number = 0
+    endDate: number = 0,
+    singlePay?: number
   ) => {
     e.preventDefault();
     let ed = endDate;
     if (payBtn === "bulk") {
       ed = 0;
     }
-    // console.log(payBtn, endDate);
     if (payBtn === "single" && !checkDate(ed)) {
       Toast("error", "Stake has not ended yet");
       return 0;
     }
-    const selectedStakers = getSelectedStakers(selectedItems);
-    const selectedProfits = getSelectedProfits(selectedItems);
+    const selectedStakers = getSelectedStakers([singlePay!]);
+    const selectedProfits = getSelectedProfits([singlePay!]);
     await payReferral({
       stakers: selectedStakers,
       stakerPrt: selectedProfits,
@@ -77,6 +79,7 @@ const LevelOne = () => {
   }, [getStakes]);
 
   const handleMasterCheckboxChange = () => {
+    const path = "multi";
     const newCheckedState = !allChecked;
     setAllChecked(newCheckedState);
     setShowAction(newCheckedState);
@@ -88,25 +91,27 @@ const LevelOne = () => {
         return res;
       });
       allStakers = allStakers.filter((x) => x !== 0.1);
-      if (allStakers.length) {
-        setSelectedItems(allStakers);
+      if (path === "multi") {
+        if (allStakers.length) {
+          setSelectedItems(allStakers);
+        } else {
+          setAllChecked(!!0);
+          setShowAction(!!0);
+          Toast("error", "All users stake has not ended yet.");
+        }
+        if (selectedItems.length > 10) {
+          Toast(
+            "error",
+            "You can only select 10 stakers at a time, To reduce Blockchain time."
+          );
+          const slicedSelectedItems = selectedItems.slice(0, 10);
+          setSelectedItems(slicedSelectedItems);
+        }
       } else {
+        setSelectedItems([]);
         setAllChecked(!!0);
         setShowAction(!!0);
-        Toast("error", "All users stake has not ended yet.");
       }
-    } else {
-      setSelectedItems([]);
-      setAllChecked(!!0);
-      setShowAction(!!0);
-    }
-    if (selectedItems.length > 10) {
-      Toast(
-        "error",
-        "You can only select 10 stakers at a time, To reduce Blockchain time."
-      );
-      const slicedSelectedItems = selectedItems.slice(0, 10);
-      setSelectedItems(slicedSelectedItems);
     }
   };
 
@@ -287,7 +292,9 @@ const LevelOne = () => {
                         <Button
                           type="button"
                           color="green"
-                          onClick={(e) => payRefs(e, "single", item?.endDate)}
+                          onClick={(e) =>
+                            payRefs(e, "single", item?.endDate, item.id)
+                          }
                           className="mt-4 whitespace-nowrap rounded-tremor-small bg-green-500 px-4 py-2.5 text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-green-600 dark:bg-green-400 dark:text-green dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis sm:mt-0 sm:w-fit"
                         >
                           Payout
