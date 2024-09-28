@@ -14,7 +14,7 @@ const Exaggerate = () => {
               <span>Back</span>
             </div>
           </Link>
-          <span>End of 30th November, 2024.</span>
+          <span>Ends 30th November, 2024.</span>
         </div>
         <CampaignCard />
         <div>
@@ -28,7 +28,7 @@ const Exaggerate = () => {
             among the winners!
           </p>
 
-          <p className="mt-3">End date: November 30</p>
+          <p className="mt-3">End date: November 30, 2024.</p>
         </div>
 
         <div>
