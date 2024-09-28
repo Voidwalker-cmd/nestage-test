@@ -402,7 +402,10 @@ const Modal = () => {
                         <CardBody>
                           <span className="text-small text-default-500">
                             <ul className="checklist">
-                              <li>Minimum entry fee 2 BUSD</li>
+                              <li>
+                                Minimum entry fee{" "}
+                                {SiteUrl.includes("testing") ? 2 : 10} BUSD
+                              </li>
                               <li>40% profit on your stake</li>
                               <li>Instant transactions</li>
                               <li>Zero effort required</li>
@@ -438,7 +441,10 @@ const Modal = () => {
                         <CardBody>
                           <span className="text-small text-default-500">
                             <ul className="checklist">
-                              <li>Entry fee 2 BUSD</li>
+                              <li>
+                                Entry fee {SiteUrl.includes("testing") ? 2 : 10}{" "}
+                                BUSD
+                              </li>
                               <li>Referral-based earnings</li>
                               <li>Transparency and automation</li>
                               <li>3 level matrix</li>
