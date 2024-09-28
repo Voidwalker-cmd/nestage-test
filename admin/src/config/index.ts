@@ -10,7 +10,6 @@ export const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
 // const LIVE_API = x !== "" || x.length > 0 ? x : "";
 
 let LIVE_API = "";
-// kkk
 
 const A = "https://application.nestage.io/api/v1/"; // Mainnet - 1
 // const LIVE_API = "https://nestage-server-main.onrender.com/api/v1/"; // Mainnet - 2

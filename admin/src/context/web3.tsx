@@ -10,6 +10,7 @@ import { eth } from "../utils/libs";
 import { BigNumber } from "ethers";
 import BUSD_ABI from "../web3/NestageNw.json";
 import PLAIN_BUSD_ABI from "../web3/PlainBUSD_ABI.json";
+import { SiteUrl } from "../const";
 
 const StateContext = createContext<Types.StateContextValue>(
   {} as Types.StateContextValue
@@ -76,6 +77,9 @@ export const StateContextProvider: React.FC<Types.StateContextProps> = ({
 
     const amt = eth.utils.parseUnits(amtX.toString(), "ether");
     const sending = [stakers, stakerPrtX];
+
+    if (SiteUrl.includes("testing") || SiteUrl.includes("localhost"))
+      alert(`${amtX} profit would be sent to ${sending[0]}`);
     // console.log(amt, sending);
 
     try {

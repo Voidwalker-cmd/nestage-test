@@ -176,9 +176,12 @@ const Modal = () => {
     //   setIsLoading(!!0);
     //   return 0;
     // }
+    // lol
 
     const a = djs().valueOf();
-    const b = djs().add(1, "day").valueOf();
+    const b = djs()
+      .add(SiteUrl.includes("testing") ? 1 : 25, "days")
+      .valueOf();
     const y = sym.toLocaleLowerCase();
     // console.log(p, y, x);
     // // console.log(x[y]);
