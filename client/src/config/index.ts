@@ -1,3 +1,5 @@
+import { SiteUrl } from "../const";
+
 export const CLIENT_ID = import.meta.env.VITE_TEMPLATE_CLIENT_ID;
 export const SITE_MODE = import.meta.env.VITE_SITE_MODE;
 export const NETWORK_MODE = import.meta.env.VITE_NETWORK_MODE;
@@ -11,11 +13,19 @@ const x = import.meta.env.VITE_LIVE_API;
 const TEST_API = import.meta.env.VITE_TEST_API;
 // const LIVE_API = x !== "" || x.length > 0 ? x : ""; //
 
-// const LIVE_API = "https://application.nestage.io/api/v1/"; // Mainnet - 1
+let LIVE_API = "";
+
+const A = "https://application.nestage.io/api/v1/"; // Mainnet - 1
 // const LIVE_API = "https://nestage-server-main.onrender.com/api/v1/"; // Mainnet - 2
-const LIVE_API = "https://api-testing.nestage.io/api/v1/"; // Testnet - 1
+const B = "https://api-testing.nestage.io/api/v1/"; // Testnet - 1
 // const LIVE_API = "https://nestage-server-testing.onrender.com/api/v1/"; // Testnet - 2
 // const LIVE_API = "https://n-server-1lbk.onrender.com/api/v1/";
+
+if (SiteUrl.includes("testing") || SiteUrl.includes("localhost")) {
+  LIVE_API = B;
+} else {
+  LIVE_API = A;
+}
 
 export const API_URL = SITE_MODE === "live" ? LIVE_API : TEST_API;
 
