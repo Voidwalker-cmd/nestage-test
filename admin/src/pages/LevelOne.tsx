@@ -79,7 +79,6 @@ const LevelOne = () => {
   }, [getStakes]);
 
   const handleMasterCheckboxChange = () => {
-    const path = "multi";
     const newCheckedState = !allChecked;
     setAllChecked(newCheckedState);
     setShowAction(newCheckedState);
@@ -91,27 +90,25 @@ const LevelOne = () => {
         return res;
       });
       allStakers = allStakers.filter((x) => x !== 0.1);
-      if (path === "multi") {
-        if (allStakers.length) {
-          setSelectedItems(allStakers);
-        } else {
-          setAllChecked(!!0);
-          setShowAction(!!0);
-          Toast("error", "All users stake has not ended yet.");
-        }
-        if (selectedItems.length > 10) {
-          Toast(
-            "error",
-            "You can only select 10 stakers at a time, To reduce Blockchain time."
-          );
-          const slicedSelectedItems = selectedItems.slice(0, 10);
-          setSelectedItems(slicedSelectedItems);
-        }
+      if (allStakers.length) {
+        setSelectedItems(allStakers);
       } else {
-        setSelectedItems([]);
         setAllChecked(!!0);
         setShowAction(!!0);
+        Toast("error", "All users stake has not ended yet.");
       }
+    } else {
+      setSelectedItems([]);
+      setAllChecked(!!0);
+      setShowAction(!!0);
+    }
+    if (selectedItems.length > 10) {
+      Toast(
+        "error",
+        "You can only select 10 stakers at a time, To reduce Blockchain time."
+      );
+      const slicedSelectedItems = selectedItems.slice(0, 10);
+      setSelectedItems(slicedSelectedItems);
     }
   };
 
