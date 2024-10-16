@@ -4,6 +4,7 @@ import { useDisconnect } from "@thirdweb-dev/react";
 import { djs, Formatter, shortenHexString, uuid } from "../../../config/utils";
 import { CloseIconL, PowerButtonI } from "../../atom/Icons";
 import { useStateContext } from "../../../context/Web3";
+import { Lock } from "lucide-react";
 import {
   AddNewRefParams,
   FormData,
@@ -58,6 +59,7 @@ const Modal = () => {
   const [txtt, setTxtt] = useState<string>("Awaiting Approval");
   const [err, setErr] = useState<string>("");
   const [btnState, setBtnState] = useState<string>("init");
+  const [levelOneOpened, setLevelOneOpened ] = useState<boolean>(!!0);
   const [refCode, setRefCode] = useState<string | null>(
     localStorage.getItem("ref")
   );
@@ -670,14 +672,21 @@ const Modal = () => {
                                 )}
                                 <span>{btnState}</span>
                               </button>
-                            ) : (
-                              <button
+                            ) : levelOneOpened ? (
+                                <button
                                 type="button"
                                 onClick={handleStartStake}
                                 className="w-full px-4 py-2 mt-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-600 rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40"
                               >
                                 Start
                               </button>
+                            ) : (
+                              <span
+                              title="Level One Staking on Hold!"
+                                className="w-full flex justify-center items-center px-4 py-2 mt-3 text-sm font-medium tracking-wide capitalize transition-colors duration-300 transform bg-rose-200 text-rose-600 border border-rose-600 cursor-not-allowed rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-rose-300 hover:text-rose-700 focus:outline-none focus:ring focus:ring-rose-300 focus:ring-opacity-40"
+                              >
+                                <Lock className="w-5 h-5" />
+                              </span>
                             )}
                           </div>
                         </form>
