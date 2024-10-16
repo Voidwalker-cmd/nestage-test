@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useMiningContext } from "../../../context/MiningContext";
 import { ParsedMiningData } from "../../../types/types";
 import { SortIconI } from "../../atom/Icons";
+import { Lock } from "lucide-react";
 import {
   convertDateTime,
   datetimeDurationPercent,
@@ -25,6 +26,7 @@ const DashboardTable = () => {
   const [endDateSort, setEndDateSort] = useState<SortOrder>("asc");
   const [convertedAmt, setConvertedAmt] = useState<number>(0);
   const [d, setD] = useState<number | string>(0);
+  const [levelOneOpened, setLevelOneOpened ] = useState<boolean>(!!0);
 
   const sortMining = (
     data: ParsedMiningData[],
@@ -298,6 +300,7 @@ const DashboardTable = () => {
             <img src={Static.no_data} alt="" width={90} height={90} />
             No Active Stake.
             <div className="my-2">
+            {ddddd ? (
               <button
                 onClick={() => {
                   sessionStorage.setItem("MV938aO", "kYgxU8x");
@@ -307,6 +310,15 @@ const DashboardTable = () => {
               >
                 Activate Level 1
               </button>
+            ) : (
+              (
+                <span
+                title="Level One Staking on Hold!"
+                  className="w-full flex justify-center items-center px-4 py-2 mt-3 text-sm font-medium tracking-wide capitalize transition-colors duration-300 transform bg-rose-200 text-rose-600 border border-rose-600 cursor-not-allowed rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-rose-300 hover:text-rose-700 focus:outline-none focus:ring focus:ring-rose-300 focus:ring-opacity-40"
+                >
+                  <Lock className="w-5 h-5" />
+                </span>
+              )}
             </div>
           </div>
         )}
