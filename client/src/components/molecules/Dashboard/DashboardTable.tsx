@@ -300,7 +300,7 @@ const DashboardTable = () => {
             <img src={Static.no_data} alt="" width={90} height={90} />
             No Active Stake.
             <div className="my-2">
-            {ddddd ? (
+            {levelOneOpened ? (
               <button
                 onClick={() => {
                   sessionStorage.setItem("MV938aO", "kYgxU8x");
@@ -311,7 +311,6 @@ const DashboardTable = () => {
                 Activate Level 1
               </button>
             ) : (
-              (
                 <span
                 title="Level One Staking on Hold!"
                   className="w-full flex justify-center items-center px-4 py-2 mt-3 text-sm font-medium tracking-wide capitalize transition-colors duration-300 transform bg-rose-200 text-rose-600 border border-rose-600 cursor-not-allowed rounded-md sm:mt-0 sm:w-1/2 sm:mx-2 hover:bg-rose-300 hover:text-rose-700 focus:outline-none focus:ring focus:ring-rose-300 focus:ring-opacity-40"
